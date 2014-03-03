@@ -14,10 +14,10 @@ Upon loading an IO object, the *verify* method is called on the object to ensure
 				var result = false
       	if( typeof io === 'object' ) {
 IO objects can have either inputs, outputs or both, but must have at least one.					
-      		if( io.inputs || io.outputs ) {
-      			result = true
-      		}
-      	}
-				return result
+          if( io.inputs || io.outputs ) {
+            result = true
+        	}
+        }
+        return result
       }
     }
