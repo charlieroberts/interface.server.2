@@ -21,26 +21,42 @@ Upon loading an IO object, the *verify* method is called on the object to ensure
 
       verify: function( io ) {
         var result = false
+        
         if( typeof io === 'object' ) {
-          if( io.inputs || io.outputs ) {
+          if( ( io.inputs || io.outputs ) && io.init ) {
             result = true
           }
         }
+        
         return result
       },
       
+The *load* method attempts to find a given IO module and require it. If the module is found and verified, the module's *init* method is then called.
+
       load: function( ioName ) {
         var io
+        
+        if( _.contains( this.loaded, ioName ) {
+          console.log( 'module ' + ioName + ' is already loaded.' )
+          return
+        }
         
         try {
           io = require( ioName )
         }catch( e ) {
-          console.log( 'module ' + ioName + ' not found.' )  
+          console.log( 'module ' + ioName + ' not found.' )
+          return
         }
         
         if( this.verify( io ) ) {
           io.init()
           this.loaded.push( ioName )
         }
+      },
+      
+The *init* function loads every io stored named in the *defaults* array. TODO: there should be some type of user preferences that decide which modules are loaded.
+
+      init: function() {
+        _.forEach( this.defaults, this.load )
       },
     }
