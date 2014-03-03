@@ -3,6 +3,7 @@ IOManager
 The IOManager handles loading, verification, enumeration and disposal of IO objects.
 
 **lo-dash** is our utility library of choice
+
     var _ = require('lodash')
 		
     IM = module.exports = {				
