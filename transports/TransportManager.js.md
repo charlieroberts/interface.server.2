@@ -1,11 +1,11 @@
 TransportManager
-=========
+================
 The TransportManager loads and manages abstractions for the various protocols that IS2 speaks, such
 as OSC, MIDI and WebSockets.
 
 **lo-dash** is our utility library of choice
 
-    var _
+    var _ = require( 'lodash' )
 		
     TM = module.exports = {
       app: null,
@@ -25,7 +25,7 @@ Transports must have methods for initialization, opening / closing, and sending 
         var result = false
         
         if( typeof transport === 'object' ) {
-          if( ( transport.init && transport.open && transport.close && transport.send && transport.receive ) ) {
+          if( ( transport.init && transport.open && transport.close ) ) {
             result = true
           }else{
             console.error( 'Transport ' + transportName + ' is not a valid transport module.' )
@@ -62,7 +62,6 @@ The *init* function loads every io stored named in the *defaults* array. TODO: t
 
       init: function( app ) {
         this.app = app
-        _ = this.app.packages.lodash
         
         _.forEach( this.defaults, this.load )
         

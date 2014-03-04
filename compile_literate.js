@@ -4,9 +4,10 @@ var fs = require( 'fs' ),
     list;
 
 list = [
-  'io/IOManager',
-  'io/hid',
-  'main',
+  'src/io/IOManager',
+  'src/io/hid',
+  'src/transports/TransportManager',
+  'src/main',
 ]
 
 for( var i = 0; i < list.length; i++ ) {

@@ -1,4 +1,4 @@
-var _
+var _ = require( 'lodash' )
 IM = module.exports = {
 app: null,
 defaults: [ 'hid' ],
@@ -39,10 +39,23 @@ IM.loaded.push( ioName )
 
 init: function( app ) {
 this.app = app
-_ = this.app.packages.lodash
 
 _.forEach( this.defaults, this.load )
 
 return this
 },
+
+IO : function( props ) {
+_.assign( this, {
+inputs:  {},
+outputs: {},
+})
+
+_.assign( this, props )
+},
 }
+
+_.assign( IM.IO.prototype, {
+getInputNames:  function() { return _.keys( this.inputs ) },
+getOutputNames: function() { return _.keys( this.outputs ) },
+})

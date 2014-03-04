@@ -4,15 +4,16 @@ main.js
     var _
 
     IS2 = {
-      moduleManager: null,
+      ioManager: null,
       packages: {
         lodash : null
       },
-      root: __dirname + '/',
+      root: __dirname + '/src/',
+      src: __dirname + '/src/',
       init: function() {
         _ = this.packages.lodash = require( 'lodash' )
         
-        this.moduleManager = require( './io/IOManager.js' ).init( this )
+        this.ioManager = require( './io/IOManager.js' ).init( this )
       }
     }
     

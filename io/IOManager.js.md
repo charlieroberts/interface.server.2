@@ -4,7 +4,7 @@ The IOManager handles loading, verification, enumeration and disposal of IO obje
 
 **lo-dash** is our utility library of choice
 
-    var _
+    var _ = require( 'lodash' )
 		
     IM = module.exports = {
       app: null,
@@ -59,10 +59,26 @@ The *init* function loads every io stored named in the *defaults* array. TODO: t
 
       init: function( app ) {
         this.app = app
-        _ = this.app.packages.lodash
         
         _.forEach( this.defaults, this.load )
         
         return this
       },
+
+*defaultIOProperties* are used whenever a new IO object is created to populate it with reasonable default properties. These
+defaults can be overridden by passing a dictionary to the IO constructor.
+      
+      IO : function( props ) {
+        _.assign( this, {
+          inputs:  {},
+          outputs: {},
+        })
+        
+        _.assign( this, props )
+      },
     }
+    
+    _.assign( IM.IO.prototype, {
+      getInputNames:  function() { return _.keys( this.inputs ) },
+      getOutputNames: function() { return _.keys( this.outputs ) },
+    })

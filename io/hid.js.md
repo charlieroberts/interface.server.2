@@ -2,7 +2,7 @@ HID
 ===
 _ is our lo-dash reference, while HID refers to the node HID module, https://www.npmjs.org/package/node-hid.
 
-    var _, HID, EE,
+    var _ = require( 'lodash' ), HID, EE,
 		
     _HID = module.exports = {
       app: null,
@@ -11,16 +11,14 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
       getDeviceNames: function() { return _.pluck( this.devices, 'product' ) },
       init: function( app ) {
         this.app = app
+                
+        EE = require( 'events' ).EventEmitter
         
-        _ = this.app.packages.lodash
-        
-        EE = require('events').EventEmitter
-        
-        HID = require( this.app.root + 'io/node_modules/node-hid')
+        HID = require( 'node-hid' )
         
         this.devices = HID.devices()
         
-        //console.log( this.getDeviceNames() )
+        console.log( this.getDeviceNames() )
         
         var idx = _.findIndex( this.devices, { manufacturer:'Mega World'} )
         var device = new HID.HID( this.devices[ idx ].path )
@@ -70,15 +68,15 @@ as the value of all buttons on the gamepad are stored in a single 8-bit int
       },
       inputs: {},
       outputs:{
-        'X': { min:0, max:255 },
-        'Y': { min:0, max:255 },
-        'Button0': { min:0, max:1 },
-        'Button1': { min:0, max:1 },
-        'Button2': { min:0, max:1 },
-        'Button3': { min:0, max:1 },
-        'Button4': { min:0, max:1 },
-        'Button5': { min:0, max:1 },
-        'Button6': { min:0, max:1 },
-        'Button7': { min:0, max:1 },                                                        
+        'X': { min:0, max:255, value:127 },
+        'Y': { min:0, max:255, value:127 },
+        'Button0': { min:0, max:1, value:0 },
+        'Button1': { min:0, max:1, value:0 },
+        'Button2': { min:0, max:1, value:0 },
+        'Button3': { min:0, max:1, value:0 },
+        'Button4': { min:0, max:1, value:0 },
+        'Button5': { min:0, max:1, value:0 },
+        'Button6': { min:0, max:1, value:0 },
+        'Button7': { min:0, max:1, value:0 },                                                        
       }
     }
