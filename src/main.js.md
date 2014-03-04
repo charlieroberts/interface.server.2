@@ -8,8 +8,7 @@ main.js
       packages: {
         lodash : null
       },
-      root: __dirname + '/src/',
-      src: __dirname + '/src/',
+      root: __dirname + '/',
       init: function() {
         _ = this.packages.lodash = require( 'lodash' )
         
