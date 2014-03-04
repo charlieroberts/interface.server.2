@@ -14,9 +14,9 @@ main.js
         this.emit( 'blah', 1 )
         this.ioManager = require( './io/IOManager.js' ).init( this )
         this.transportManager = require( './transports/TransportManager.js' ).init( this )        
-        this.interfaceManager = require( './InterfaceManager.js' ).init( this )
+        this.applicationManager = require( './ApplicationManager.js' ).init( this )
         
-        setTimeout( this.interfaceManager.createApp.bind( this.interfaceManager ), 1000 )
+        setTimeout( this.applicationManager.createApp.bind( this.applicationManager, this.applicationManager.testApp ), 1000 )
       }
     }
     

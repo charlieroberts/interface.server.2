@@ -14,9 +14,9 @@ as OSC, MIDI and WebSockets.
 
       defaults: [ 'OSC' ],
 
-The *loaded* array stores all transports that have been loaded by the IOManager			
+The *transports* dictionary stores all transports that have been loaded by the IOManager			
 
-      loaded: {},
+      transports: {},
 
 Upon loading a transport, the *verify* method is called on the object to ensure that it is valid.
 Transports must have methods for initialization, opening / closing, and sending / receiving.
@@ -40,7 +40,7 @@ The *load* method attempts to find a given IO module and require it. If the modu
       load: function( transportName ) {
         var transport
         
-        if( _.has( TM.loaded, transportName ) ) {
+        if( _.has( TM.transports, transportName ) ) {
           console.log( 'Transport ' + transportName + ' is already loaded.' )
           return
         }
@@ -58,7 +58,7 @@ The *load* method attempts to find a given IO module and require it. If the modu
         
         if( TM.verify( transport, transportName ) ) {
           transport.init( TM.app )
-          TM.loaded[ transportName ] = transport
+          TM.transports[ transportName ] = transport
         }
       },
       
@@ -70,5 +70,25 @@ The *init* function loads every io stored named in the *defaults* array. TODO: t
         _.forEach( this.defaults, this.load )
         
         return this
+      },
+      
+*createDestination* takes a dictionary argument and uses it to return some type of 
+socket connection based on the value of the type property in dictionary. It abstracts the creation of
+WebSocket / OSC / MIDI etc. connection.
+
+      createDestination: function( properties ) {
+        if( !_.has( this.transports, properties.type ) ) {
+          throw 'Requested transport ' + properties.type + ' not found while creating destination'
+        }
+        
+        var destination = null
+        switch( properties.type ) {
+          case 'OSC':
+            destination = this.transports[ 'OSC' ].sender( properties.ip, properties.port )
+            break;
+          default:
+        }
+        
+        return destination
       },
     }
