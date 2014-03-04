@@ -16,11 +16,11 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
         
         EE = require('events').EventEmitter
         
-        HID = require( this.app.root + 'modules/node_modules/node-hid')
+        HID = require( this.app.root + 'io/node_modules/node-hid')
         
         this.devices = HID.devices()
         
-        console.log( this.getDeviceNames() )
+        //console.log( this.getDeviceNames() )
         
         var idx = _.findIndex( this.devices, { manufacturer:'Mega World'} )
         var device = new HID.HID( this.devices[ idx ].path )

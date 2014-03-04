@@ -41,8 +41,9 @@ The *load* method attempts to find a given IO module and require it. If the modu
           return
         }
         
+        //console.log(IM.app.root + 'io/' + ioName + '.js')
         try {
-          io = require( IM.app.root + 'lib/' + ioName + '.js' )
+          io = require( IM.app.root + 'io/' + ioName + '.js' )
         }catch( e ) {
           console.log( 'module ' + ioName + ' not found.' )
           return
@@ -61,5 +62,7 @@ The *init* function loads every io stored named in the *defaults* array. TODO: t
         _ = this.app.packages.lodash
         
         _.forEach( this.defaults, this.load )
+        
+        return this
       },
     }

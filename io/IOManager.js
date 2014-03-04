@@ -23,8 +23,9 @@ console.log( 'module ' + ioName + ' is already loaded.' )
 return
 }
 
+//console.log(IM.app.root + 'io/' + ioName + '.js')
 try {
-io = require( IM.app.root + 'lib/' + ioName + '.js' )
+io = require( IM.app.root + 'io/' + ioName + '.js' )
 }catch( e ) {
 console.log( 'module ' + ioName + ' not found.' )
 return
@@ -41,5 +42,7 @@ this.app = app
 _ = this.app.packages.lodash
 
 _.forEach( this.defaults, this.load )
+
+return this
 },
 }

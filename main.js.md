@@ -5,18 +5,14 @@ main.js
 
     IS2 = {
       moduleManager: null,
-      hid: null,
       packages: {
         lodash : null
       },
-      root: __dirname + '/../',
+      root: __dirname + '/',
       init: function() {
-        _ = this.packages.lodash = require( '../build/node_modules/lodash' )
+        _ = this.packages.lodash = require( 'lodash' )
         
-        this.moduleManager = require( './ModuleManager.js' ),
-        this.hid           = require( './hid.js' )
-        
-        this.moduleManager.init( this )
+        this.moduleManager = require( './io/IOManager.js' ).init( this )
       }
     }
     
