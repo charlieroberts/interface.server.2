@@ -21,7 +21,7 @@ TODO: There is a change omgosc should be replaced with osc-min... requires resea
 *receiver* Create an OSC receiver on given port with an optional name. If no name is provided, the port
 will be named with a uuid. Return the newly opened socket for event handling.
       
-      receiver: function( port, _name, ) {
+      receiver: function( port, _name ) {
         var oscin = new omgosc.UdpReceiver( port || 8080 ),
             name = _name || oscInputCount++
         
@@ -54,3 +54,4 @@ existing OSC sockets are closed.
           this.receivers = {}
         }
       },
+    }

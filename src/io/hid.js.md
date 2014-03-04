@@ -2,7 +2,7 @@ HID
 ===
 _ is our lo-dash reference, while HID refers to the node HID module, https://www.npmjs.org/package/node-hid.
 
-    var _ = require( 'lodash' ), HID, EE,
+    var _ = require( 'lodash' ), HID, EE = require('events').EventEmitter, util = require( 'util' )
 		
     _HID = module.exports = {
       app: null,
@@ -11,25 +11,31 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
       getDeviceNames: function() { return _.pluck( this.devices, 'product' ) },
       init: function( app ) {
         this.app = app
+
+        this.__proto__ = new EE()
                 
-        EE = require( 'events' ).EventEmitter
-        
         HID = require( 'node-hid' )
         
         this.devices = HID.devices()
         
-        console.log( this.getDeviceNames() )
+        //console.log( this.getDeviceNames() )
+      },
+      
+      test: function() {
+        var idx = _.findIndex( this.devices, { manufacturer:'Mega World'} ),
+            device = new HID.HID( this.devices[ idx ].path )
         
-        var idx = _.findIndex( this.devices, { manufacturer:'Mega World'} )
-        var device = new HID.HID( this.devices[ idx ].path )
-        
+        device.name = this.devices[ idx ].product
         device.btnState = [0,0,0,0,0,0,0]
         
+        device.outputs = _HID.outputs
+        
+        this.emit( 'new device', device.name, device )
         this.loaded.push( device )
 
         device.on( 'data', this.read.bind( device ) )
       },
-
+      
 *read* examines buffered hex data the gamepad outputs and emits notification when changes occur
      
       read: function( data ) {

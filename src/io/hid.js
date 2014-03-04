@@ -1,4 +1,4 @@
-var _ = require( 'lodash' ), HID, EE,
+var _ = require( 'lodash' ), HID, EE = require('events').EventEmitter, util = require( 'util' )
 _HID = module.exports = {
 app: null,
 devices: null,
@@ -6,23 +6,29 @@ loaded: [],
 getDeviceNames: function() { return _.pluck( this.devices, 'product' ) },
 init: function( app ) {
 this.app = app
-
-EE = require( 'events' ).EventEmitter
+this.__proto__ = new EE()
 
 HID = require( 'node-hid' )
 
 this.devices = HID.devices()
 
-console.log( this.getDeviceNames() )
+//console.log( this.getDeviceNames() )
+},
 
-var idx = _.findIndex( this.devices, { manufacturer:'Mega World'} )
-var device = new HID.HID( this.devices[ idx ].path )
+test: function() {
+var idx = _.findIndex( this.devices, { manufacturer:'Mega World'} ),
+device = new HID.HID( this.devices[ idx ].path )
 
+device.name = this.devices[ idx ].product
 device.btnState = [0,0,0,0,0,0,0]
 
+device.outputs = _HID.outputs
+
+this.emit( 'new device', device.name, device )
 this.loaded.push( device )
 device.on( 'data', this.read.bind( device ) )
 },
+
 
 read: function( data ) {
 var xaxis = data[ 0 ],

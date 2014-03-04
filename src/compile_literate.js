@@ -7,7 +7,8 @@ files = [
   'io/IOManager',
   'io/hid',
   'transports/TransportManager',
-  'transports/OSC',  
+  'transports/OSC',
+  'InterfaceManager',
   'main',
 ]
 

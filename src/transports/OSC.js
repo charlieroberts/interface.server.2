@@ -13,7 +13,7 @@ omgosc = require( 'omgosc' )
 },
 
 
-receiver: function( port, _name, ) {
+receiver: function( port, _name ) {
 var oscin = new omgosc.UdpReceiver( port || 8080 ),
 name = _name || oscInputCount++
 
@@ -39,3 +39,4 @@ recv.close()
 this.receivers = {}
 }
 },
+}
