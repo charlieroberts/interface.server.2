@@ -77,9 +77,15 @@ return output
 
 inputIO.on(
 mapping.input.name,
-function( value, previous ) {
-_out.emit( transform( value ) )
-}
+function( inputValue, previousInput ) {
+var output = transform( inputValue )
+
+// TODO: is only one of these needed?
+if( typeof this.expression === 'function' )    output = this.expression( output )
+if( typeof mapping.expression === 'function' ) output = mapping.expression( output )
+
+this.emit( output )
+}.bind( _out )
 )
 }, this )
 },
@@ -92,11 +98,11 @@ testApp: [
 "    { type:'OSC', ip:'127.0.0.1', port:8081 }",
 "  ],",
 "  inputs: {",
-"    blah:  { name:'blah', min: 200, max: 300, destination: 0 },",
-"    blah2: { name:'blah2', min: 0, max: 1, destination: 1 }    ",
+"    blah:  { name:'blah', min: 200, max: 300, destination: 0, expression: function( v ) { return v * 4 } },",
+"    blah2: { name:'blah2', min: 0, max: 1, destination: 1 }",
 "  },",
 "  mappings: [",
-"    { input: { io:'USB 2-Axis 8-Button Gamepad', name:'Button1' }, output:{ io:'test', name:'blah'  } },",
+"    { input: { io:'USB 2-Axis 8-Button Gamepad', name:'Button1' }, output:{ io:'test', name:'blah'  }, expression: function( v ) { return v * .33 } },",
 "    { input: { io:'USB 2-Axis 8-Button Gamepad', name:'Button2' }, output:{ io:'test', name:'blah2' } }",
 "  ]",
 "}"

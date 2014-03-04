@@ -50,7 +50,7 @@ The *load* method attempts to find a given IO module and require it. If the modu
         try {
           transport = require( TM.app.root + 'transports/' + transportName + '.js' )
         }catch( e ) {
-          console.log( 'Transport ' + transportName + ' not found.' )
+          throw 'Transport ' + transportName + ' not found.'
           return
         }finally{
           console.log( 'Transport ' + transportName + ' is loaded.' )
