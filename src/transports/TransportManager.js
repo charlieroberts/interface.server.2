@@ -1,7 +1,7 @@
 var _ = require( 'lodash' )
 TM = module.exports = {
 app: null,
-defaults: [ 'OSC' ],
+defaults: [ 'OSC', 'WebSocket' ],
 transports: {},
 verify: function( transport, transportName ) {
 var result = false

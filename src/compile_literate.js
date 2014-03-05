@@ -8,6 +8,7 @@ files = [
   'io/hid',
   'transports/TransportManager',
   'transports/OSC',
+  'transports/WebSocket',  
   'ApplicationManager',
   'main',
 ]

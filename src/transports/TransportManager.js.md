@@ -12,7 +12,7 @@ as OSC, MIDI and WebSockets.
 
 *defaults* is an array of transports that are loaded by default.
 
-      defaults: [ 'OSC' ],
+      defaults: [ 'OSC', 'WebSocket' ],
 
 The *transports* dictionary stores all transports that have been loaded by the IOManager			
 
