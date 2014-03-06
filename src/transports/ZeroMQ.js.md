@@ -1,8 +1,9 @@
-WebSocket
-=========
-By default, IS2 opens a WebSocket on port 9080. Applications can configure sockets to be opened on other ports
-as they see fit. Messages sent from IS2 to clients come in the form { path:'/some/path/to/somewhere', values:[ 0,1,"stringy" ] }.
-You can test basic WebSocket functionality by running IS2 and then opening the webSocketTest.htm file found in the *tests* directory.
+ZeroMQ
+======
+By default, IS2 opens a ZeroMQ push service on port 10080. Applications can configure services to be opened on other ports
+as they see fit. Messages sent from IS2 to clients come in as JSON strings in the form of
+{ path:'/some/path/to/somewhere', values:[ 0,1,"stringy" ] }. You can test basic ZeroMQ functionality by running IS2 and then 
+running the zeroMQ_test.js file found in the *tests* directory using node.
 
 _ is our lo-dash reference; this object also relies on the node ws module: https://www.npmjs.org/package/ws.
 
@@ -23,9 +24,7 @@ _ is our lo-dash reference; this object also relies on the node ws module: https
         
         EE = require( 'events' ).EventEmitter
         this.__proto__ = new EE()
-        
-        this.server = this.createServer( '127.0.0.1', 9080 )
-        
+                
         this.on( 'ZeroMQ server created', function( server, port ) {
           ZMQ.servers[ port ] = server 
         })
@@ -41,9 +40,7 @@ _ is our lo-dash reference; this object also relies on the node ws module: https
             
         server.bindSync( 'tcp://' + ip + ':' + port );
         
-        server.clients = {} // TODO: this is already an array defined by the ws module.
-        
-        //server.on( 'connection', this.onClientConnection.bind( server ) )
+        server.clients = {}
         
         server.output = function( path, typetags, values ) { // TODO: you should be able to target individual clients
           this.send( JSON.stringify({ 'path': path, 'value':values }) )
@@ -54,38 +51,5 @@ _ is our lo-dash reference; this object also relies on the node ws module: https
         this.emit( 'ZeroMQ server created', server, port )
         
         return server
-      },
-      
-      onClientConnection : function( client ) { // "this" is bound to a ws server
-        client.ip = client._socket.remoteAddress;
-        this.clients[ client.ip ] = WS.clients[ client.ip ] = client
-        
-        client.on( 'message', function( msg ) {
-          console.log( 'ZMQ MSG:', msg )
-          client.send( JSON.stringify( { handshake: true } ) )
-        })
-        
-        client.on( 'close', function() {
-          delete WS.clients[ client.ip ]
-          WS.emit( 'ZeroMQ client closed', client.ip )
-        })
-        
-        WS.emit( 'ZeroMQ client opened', client.ip )
-      },
-
-*close* Close a socket using an optional name argument. If no name argument is provided, all
-existing OSC sockets are closed.
-      
-      
-      close: function( name ) {
-        if( name ) {
-          this.receivers[ name ].close()
-          delete this.receivers[ name ]
-        }else{
-          _.forIn( this.receivers, function( recv ) {
-            recv.close()
-          })
-          this.receivers = {}
-        }
       },
     }
