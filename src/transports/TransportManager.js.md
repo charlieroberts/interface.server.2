@@ -12,7 +12,7 @@ as OSC, MIDI and WebSockets.
 
 *defaults* is an array of transports that are loaded by default.
 
-      defaults: [ 'OSC', 'WebSocket' ],
+      defaults: [ 'OSC', 'WebSocket', 'ZeroMQ' ],
 
 The *transports* dictionary stores all transports that have been loaded by the IOManager			
 
@@ -88,6 +88,10 @@ WebSocket / OSC / MIDI etc. connection.
             break;
           case 'WebSocket':
             destination = this.transports[ 'WebSocket' ].createServer( properties.port )
+            break;
+          case 'ZeroMQ':
+            destination = this.transports[ 'ZeroMQ' ].createServer( properties.ip, properties.port )            
+            break;
           default:
         }
         

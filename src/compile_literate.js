@@ -9,6 +9,7 @@ files = [
   'transports/TransportManager',
   'transports/OSC',
   'transports/WebSocket',  
+  'transports/ZeroMQ',  
   'ApplicationManager',
   'main',
 ]

@@ -1,7 +1,7 @@
 var _ = require( 'lodash' )
 TM = module.exports = {
 app: null,
-defaults: [ 'OSC', 'WebSocket' ],
+defaults: [ 'OSC', 'WebSocket', 'ZeroMQ' ],
 transports: {},
 verify: function( transport, transportName ) {
 var result = false
@@ -54,15 +54,17 @@ createDestination: function( properties ) {
 if( !_.has( this.transports, properties.type ) ) {
 throw 'Requested transport ' + properties.type + ' not found while creating destination'
 }
-console.log( "DESTINATION", properties.type )
 var destination = null
 switch( properties.type ) {
 case 'OSC':
 destination = this.transports[ 'OSC' ].sender( properties.ip, properties.port )
 break;
 case 'WebSocket':
-console.log( 'WebSocket destination')
 destination = this.transports[ 'WebSocket' ].createServer( properties.port )
+break;
+case 'ZeroMQ':
+destination = this.transports[ 'ZeroMQ' ].createServer( properties.ip, properties.port )
+break;
 default:
 }
 

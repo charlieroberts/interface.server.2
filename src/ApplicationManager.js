@@ -51,11 +51,21 @@ this.emit( 'new application', app )
 },
 map: function( mappings ) {
 _.forIn( mappings, function( mapping ) {
-var inputIO = this.app.ioManager.devices[ mapping.input.io ],
-outputIO = this.app.ioManager.devices[ mapping.output.io ],
-_in = inputIO.outputs[ mapping.input.name ],
-_out = outputIO.inputs[ mapping.output.name ],
-transform
+var inputIO, outputIO, _in, _out, transform
+
+
+inputIO = this.app.ioManager.devices[ mapping.input.io ]
+outputIO = this.app.ioManager.devices[ mapping.output.io ]
+
+if( typeof inputIO === 'undefined' ) { throw 'ERROR: Input IO device ' + mapping.input.io + ' is not found.' }
+
+_in = inputIO.outputs[ mapping.input.name ]
+
+// if( typeof outputIO === 'undefined' ) {
+//   throw 'Output IO device ' + mapping.input.io + ' is not found.'
+// }
+
+_out = outputIO.inputs[ mapping.output.name ]
 
 transform = AM.createTransformFunction( _in, _out )
 
@@ -96,7 +106,8 @@ testApp: [
 "var app = {",
 "  name:'test',",
 "  destinations: [",
-"    { type:'WebSocket', ip:'127.0.0.1', port:9081 },",
+"    { type:'ZeroMQ', ip:'127.0.0.1', port:10080 },",
+//"    { type:'WebSocket', ip:'127.0.0.1', port:9081 },",
 "    { type:'OSC', ip:'127.0.0.1', port:8081 }",
 "  ],",
 "  inputs: {",

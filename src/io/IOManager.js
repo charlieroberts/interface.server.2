@@ -40,6 +40,7 @@ io.init( IM.app )
 io.on( 'new device', function( deviceName, device ) { IM.devices[ deviceName ] = device } )
 
 IM.loaded.push( ioName )
+
 io.test()
 }
 },
