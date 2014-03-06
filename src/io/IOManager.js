@@ -5,6 +5,17 @@ IM = module.exports = {
   loaded: [],
   
   devices: {},
+  
+  init: function( app ) {
+    this.__proto__ = new EE()
+    this.app = app
+    _.forEach( this.defaults, this.load )
+    this.on( 'new device', function( device ) {
+      IM.devices[ device.name ] = device
+      console.log( "NEW DEVICE", device.name )
+    })
+    return this
+  },      
   verify: function( io ) {
     var result = false
     
@@ -45,14 +56,7 @@ IM = module.exports = {
     }
   },
   
-  init: function( app ) {
-    this.app = app
-    
-    _.forEach( this.defaults, this.load )
-    return this
-  },
-  
-  IO : function( props, name ) {
+  IO : function( props ) {
     _.assign( this, {
       inputs:  {},
       outputs: {},
@@ -62,12 +66,8 @@ IM = module.exports = {
     
     this.__proto__ = new EE()
     
-    this.on( 'new device', function( deviceName, device ) {
-      IM.devices[ deviceName ] = device
-      console.log( "NEW DEVICE", deviceName )
-    })
-    
-    IM.loaded.push( name )
+    IM.emit( 'new device', this )
+    IM.loaded.push( this.name )
   },
 }
 

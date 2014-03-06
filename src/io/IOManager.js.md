@@ -18,6 +18,24 @@ The *loaded* array stores the names all IO objects that have been loaded by the 
       loaded: [],
       
       devices: {},
+      
+The *init* function loads every io stored named in the *defaults* array. 
+TODO: there should be some type of user preferences that decide which modules are loaded.
+
+      init: function( app ) {
+        this.__proto__ = new EE()
+  
+        this.app = app
+  
+        _.forEach( this.defaults, this.load )
+  
+        this.on( 'new device', function( device ) {
+          IM.devices[ device.name ] = device
+          console.log( "NEW DEVICE", device.name )
+        })
+  
+        return this
+      },      
 
 Upon loading an IO object, the *verify* method is called on the object to ensure that it is valid. IO objects can have either inputs, outputs or both, but must have at least one.
 
@@ -62,21 +80,11 @@ The *load* method attempts to find a given IO module and require it. If the modu
           io.test()
         }
       },
-      
-The *init* function loads every io stored named in the *defaults* array. TODO: there should be some type of user preferences that decide which modules are loaded.
-
-      init: function( app ) {
-        this.app = app
-        
-        _.forEach( this.defaults, this.load )
-
-        return this
-      },
 
 *defaultIOProperties* are used whenever a new IO object is created to populate it with reasonable default properties. These
 defaults can be overridden by passing a dictionary to the IO constructor.
       
-      IO : function( props, name ) {
+      IO : function( props ) {
         _.assign( this, {
           inputs:  {},
           outputs: {},
@@ -86,12 +94,8 @@ defaults can be overridden by passing a dictionary to the IO constructor.
         
         this.__proto__ = new EE()
         
-        this.on( 'new device', function( deviceName, device ) {
-          IM.devices[ deviceName ] = device
-          console.log( "NEW DEVICE", deviceName )
-        })
-        
-        IM.loaded.push( name )
+        IM.emit( 'new device', this )
+        IM.loaded.push( this.name )
       },
     }
     

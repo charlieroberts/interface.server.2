@@ -10,7 +10,7 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
 		
     AM = module.exports = {
 
-*interfaces* is an array of all currently running interfaces in Interface.Server.
+*interfaces* is an dictionary of all currently running interfaces in Interface.Server.
 
       applications: [],
       
@@ -21,8 +21,8 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
         
         this.on( 'new application', 
           function( application ) {
-            if( AM.applications.indexOf( application ) === -1 ) {
-              AM.applications.push( application )
+            if( ! _.has( AM.applications, application.name  ) ) {
+              AM.applications[ application.name ] = application
             }
           }
         )
@@ -34,24 +34,42 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
 JavaScript string.
   
       createApp: function( appString ) {
+        var io, destinations
+        
         eval( appString )
         
-        var io = new this.app.ioManager.IO( { inputs:app.inputs, outputs:app.outputs } ),
-            _destinations = [] 
+        app.__proto__ = new EE()
+        
+        app.io = new this.app.ioManager.IO({ inputs:app.inputs, outputs:app.outputs, name: app.name })
 
-Go through all the destinations in the app. Find all app inputs that use each destination and bind their emit function to
-generate output using the *send* method of the destination.
+After generating the appropriate destinations for the application we replace the descriptors used to generate the
+destination objects with destinations themselves.
+        
+        app.destinations = this.createDestinationsForApp( app )
 
+Generate mappings for the application.
+        
+        _.forIn( app.mappings, function( mapping ) { AM.createMappingForApp( mapping, app ) } )
+        
+Emit an event telling the ApplicationManager listeners that a new application has been created.        
+        this.emit( 'new application', app )
+      },
+      
+Go through all the destinations defined for the app and create them. Find all app inputs that use each 
+destination and bind their emit function to generate output using the *output* method of the destination.      
+
+      createDestinationsForApp: function( app ) {
+        var destinations = []
         for( var i = 0; i < app.destinations.length; i++ ) {
           ( function() {
             var _destination = app.destinations[ i ], 
-                targets      = _.where( io.inputs,  { destination: i } ),
+                targets      = _.where( app.io.inputs,  { destination: i } ),
                 destination  = null
                           
-            destination = this.app.transportManager.createDestination( _destination )
+            destination = AM.app.transportManager.createDestination( _destination )
           
             if( destination !== null ) {
-              _destinations.push( destination )
+              destinations.push( destination )
             
               _.forIn( targets, function( input, key ) {
                 input.emit = function( _value ) {
@@ -59,61 +77,49 @@ generate output using the *send* method of the destination.
                 }
               })
             }
-          }.bind(this))()
+            
+            app.on( 'close', destination.close.bind( destination ) )
+          })()
         }
         
-After generating the appropriate destinations for the application we replace the descriptors used to generate the
-destination objects with destinations themselves.
-        
-        app.destinations = _destinations
-
-Give our new IO object (the application) a name. Emit an event telling IOManager listeners a new IO object has been created.
-Generate mappings for the application. Emit an event telling the ApplicationManager listeners that a new
-application has been created.
-
-        io.name = app.name
-        io.emit( 'new device', io.name, io )
-        
-        this.map( app.mappings )
-        this.emit( 'new application', app )
+        return destinations
       },
 
-*map* : For each mapping passed in the arguments array, lookup the input and output device members and create a function
-that serves as an affine transform between the input range and the output range. Add a listener to the input object that
-sends a message to the output destination whenever the input signal changes.
+*createMappingForApp* : Lookup the input and output device members and create a function that serves as an affine transform
+between the input range and the output range. Add a listener to the input object that sends a message to the output destination 
+whenever the input signal changes.
+      
+      createMappingForApp: function( mapping, app ) {
+        var inputIO, outputIO, _in, _out, transform, outputFunction
 
-      map: function( mappings ) {
-        _.forIn( mappings, function( mapping ) {
-          var inputIO, outputIO, _in, _out, transform
-          
-          inputIO = this.app.ioManager.devices[ mapping.input.io ]
-          outputIO = this.app.ioManager.devices[ mapping.output.io ]
-          
-          if( typeof inputIO === 'undefined' ) { throw 'ERROR: Input IO device ' + mapping.input.io + ' is not found.' }
-          
-          _in = inputIO.outputs[ mapping.input.name ]
-          
-          // if( typeof outputIO === 'undefined' ) {
-          //   throw 'Output IO device ' + mapping.input.io + ' is not found.'
-          // }
-          
-          _out = outputIO.inputs[ mapping.output.name ]
+        inputIO  = AM.app.ioManager.devices[ mapping.input.io ]
+        outputIO = AM.app.ioManager.devices[ mapping.output.io ]
         
-          transform = AM.createTransformFunction( _in, _out )
-              
-          inputIO.on( 
-            mapping.input.name, 
-            function( inputValue, previousInput ) {
-              var output = transform( inputValue )
-              
-              // TODO: is only one of these needed?
-              if( typeof this.expression === 'function' )    output = this.expression( output )
-              if( typeof mapping.expression === 'function' ) output = mapping.expression( output )
-              
-              this.emit( output )
-            }.bind( _out )
-          )
-        }, this )
+        if( typeof inputIO === 'undefined' ) { throw 'ERROR: Input IO device ' + mapping.input.io + ' is not found.' }
+        
+        _in  = inputIO.outputs[ mapping.input.name  ]
+        _out = outputIO.inputs[ mapping.output.name ]
+      
+        transform = AM.createTransformFunction( _in, _out )
+        
+        outputFunction = AM.createOutputFunction( mapping, transform ).bind( _out )
+            
+        inputIO.on( mapping.input.name, outputFunction )
+        mapping.input = inputIO
+        
+        app.on( 'close', function() { inputIO.removeListener( mapping.input.name, outputFunction ) })  
+      },
+      
+      createOutputFunction : function( mapping, transform ) {
+        return function( inputValue, previousInput ) { // 'this' will be bound to output app input...
+          var output = transform( inputValue )
+          
+          // TODO: is only one of these needed?
+          if( typeof this.expression    === 'function' ) output = this.expression( output )
+          if( typeof mapping.expression === 'function' ) output = mapping.expression( output )
+          
+          this.emit( output )
+        }
       },
       
       createTransformFunction : function( _in, _out ) {
@@ -132,6 +138,11 @@ sends a message to the output destination whenever the input signal changes.
           
           return output
         } 
+      },
+      
+      removeApplicationWithName : function( name ) {
+        var app = AM.applications[ name ]
+        app.emit( 'close' )
       },
       
 *testApp* is a dummy app string to use for testing purposes

@@ -11,6 +11,7 @@ files = [
   'transports/WebSocket',  
   'transports/ZeroMQ',  
   'ApplicationManager',
+  'Switchboard',  
   'main',
 ]
 
@@ -18,7 +19,6 @@ for( var i = 0; i < files.length; i++ ) {
   var filename = files[ i ],
       file = fs.readFileSync( root + filename + '.js.md', 'utf8' ), 
       out  = file.match( /( {4})(.*)/g )
-  
   
   out = _.invoke( out, 'slice', 4 )
   

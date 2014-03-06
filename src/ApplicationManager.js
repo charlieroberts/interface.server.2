@@ -9,28 +9,43 @@ AM = module.exports = {
     
     this.on( 'new application', 
       function( application ) {
-        if( AM.applications.indexOf( application ) === -1 ) {
-          AM.applications.push( application )
+        if( ! _.has( AM.applications, application.name  ) ) {
+          AM.applications[ application.name ] = application
         }
       }
     )
     return this
   },
   createApp: function( appString ) {
+    var io, destinations
+    
     eval( appString )
     
-    var io = new this.app.ioManager.IO( { inputs:app.inputs, outputs:app.outputs } ),
-        _destinations = [] 
+    app.__proto__ = new EE()
+    
+    app.io = new this.app.ioManager.IO({ inputs:app.inputs, outputs:app.outputs, name: app.name })
+    
+    app.destinations = this.createDestinationsForApp( app )
+    
+    _.forIn( app.mappings, function( mapping ) { AM.createMappingForApp( mapping, app ) } )
+    
+    
+    this.emit( 'new application', app )
+  },
+  
+  
+  createDestinationsForApp: function( app ) {
+    var destinations = []
     for( var i = 0; i < app.destinations.length; i++ ) {
       ( function() {
         var _destination = app.destinations[ i ], 
-            targets      = _.where( io.inputs,  { destination: i } ),
+            targets      = _.where( app.io.inputs,  { destination: i } ),
             destination  = null
                       
-        destination = this.app.transportManager.createDestination( _destination )
+        destination = AM.app.transportManager.createDestination( _destination )
       
         if( destination !== null ) {
-          _destinations.push( destination )
+          destinations.push( destination )
         
           _.forIn( targets, function( input, key ) {
             input.emit = function( _value ) {
@@ -38,49 +53,44 @@ AM = module.exports = {
             }
           })
         }
-      }.bind(this))()
+        
+        app.on( 'close', destination.close.bind( destination ) )
+      })()
     }
     
-    
-    app.destinations = _destinations
-    io.name = app.name
-    io.emit( 'new device', io.name, io )
-    
-    this.map( app.mappings )
-    this.emit( 'new application', app )
+    return destinations
   },
-  map: function( mappings ) {
-    _.forIn( mappings, function( mapping ) {
-      var inputIO, outputIO, _in, _out, transform
-      
-      inputIO = this.app.ioManager.devices[ mapping.input.io ]
-      outputIO = this.app.ioManager.devices[ mapping.output.io ]
-      
-      if( typeof inputIO === 'undefined' ) { throw 'ERROR: Input IO device ' + mapping.input.io + ' is not found.' }
-      
-      _in = inputIO.outputs[ mapping.input.name ]
-      
-      // if( typeof outputIO === 'undefined' ) {
-      //   throw 'Output IO device ' + mapping.input.io + ' is not found.'
-      // }
-      
-      _out = outputIO.inputs[ mapping.output.name ]
+  
+  createMappingForApp: function( mapping, app ) {
+    var inputIO, outputIO, _in, _out, transform, outputFunction
+    inputIO  = AM.app.ioManager.devices[ mapping.input.io ]
+    outputIO = AM.app.ioManager.devices[ mapping.output.io ]
     
-      transform = AM.createTransformFunction( _in, _out )
-          
-      inputIO.on( 
-        mapping.input.name, 
-        function( inputValue, previousInput ) {
-          var output = transform( inputValue )
-          
-          // TODO: is only one of these needed?
-          if( typeof this.expression === 'function' )    output = this.expression( output )
-          if( typeof mapping.expression === 'function' ) output = mapping.expression( output )
-          
-          this.emit( output )
-        }.bind( _out )
-      )
-    }, this )
+    if( typeof inputIO === 'undefined' ) { throw 'ERROR: Input IO device ' + mapping.input.io + ' is not found.' }
+    
+    _in  = inputIO.outputs[ mapping.input.name  ]
+    _out = outputIO.inputs[ mapping.output.name ]
+  
+    transform = AM.createTransformFunction( _in, _out )
+    
+    outputFunction = AM.createOutputFunction( mapping, transform ).bind( _out )
+        
+    inputIO.on( mapping.input.name, outputFunction )
+    mapping.input = inputIO
+    
+    app.on( 'close', function() { inputIO.removeListener( mapping.input.name, outputFunction ) })  
+  },
+  
+  createOutputFunction : function( mapping, transform ) {
+    return function( inputValue, previousInput ) { // 'this' will be bound to output app input...
+      var output = transform( inputValue )
+      
+      // TODO: is only one of these needed?
+      if( typeof this.expression    === 'function' ) output = this.expression( output )
+      if( typeof mapping.expression === 'function' ) output = mapping.expression( output )
+      
+      this.emit( output )
+    }
   },
   
   createTransformFunction : function( _in, _out ) {
@@ -99,6 +109,11 @@ AM = module.exports = {
       
       return output
     } 
+  },
+  
+  removeApplicationWithName : function( name ) {
+    var app = AM.applications[ name ]
+    app.emit( 'close' )
   },
   
   testApp: [
