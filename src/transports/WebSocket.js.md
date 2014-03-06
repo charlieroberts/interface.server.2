@@ -36,29 +36,15 @@ _ is our lo-dash reference; this object also relies on the node ws module: https
         
         var server = new ( require( 'ws' ).Server )({ 'port': port })
         
-        server.clients = []
+        //server.clients = {} // TODO: this is already an array defined by the ws module.
         
-        server.on( 'connection', function( client ) {
-          client.ip = client._socket.remoteAddress;
-          server.clients[ client.ip ] = WS.clients[ client.ip ] = client
-          
-          client.on( 'message', function( msg ) {
-            console.log( 'WS MSG:', msg )
-            client.send( JSON.stringify( { handshake: true } ) )
-          })
-          
-          client.on( 'close', function() {
-            delete WS.clients[ client.ip ]
-            WS.emit( 'WebSocket client closed', client.ip )
-          })
-          
-          WS.emit( 'WebSocket client opened', client.ip )
-        })
+        server.on( 'connection', this.onClientConnection.bind( server ) )
         
-        server.output = function( path, typetags, values ) {
-          _.forIn( server.clients, function( client ) {
+        server.output = function( path, typetags, values ) { // TODO: you should be able to target individual clients
+          for( var i = 0; i < server.clients.length; i++ ) {
+            var client = server.clients[ i ]
             client.send( JSON.stringify({ 'path': path, 'value':values }) )
-          })
+          }
         }
         
         WS.servers[ port ] = server
@@ -66,6 +52,23 @@ _ is our lo-dash reference; this object also relies on the node ws module: https
         this.emit( 'WebSocket server created', server, port )
         
         return server
+      },
+      
+      onClientConnection : function( client ) { // "this" is bound to a ws server
+        client.ip = client._socket.remoteAddress;
+        this.clients[ client.ip ] = WS.clients[ client.ip ] = client
+        
+        client.on( 'message', function( msg ) {
+          console.log( 'WS MSG:', msg )
+          client.send( JSON.stringify( { handshake: true } ) )
+        })
+        
+        client.on( 'close', function() {
+          delete WS.clients[ client.ip ]
+          WS.emit( 'WebSocket client closed', client.ip )
+        })
+        
+        WS.emit( 'WebSocket client opened', client.ip )
       },
 
 *close* Close a socket using an optional name argument. If no name argument is provided, all

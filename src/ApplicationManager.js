@@ -1,5 +1,5 @@
 var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter,
-IM = module.exports = {
+AM = module.exports = {
 applications: [],
 
 init: function( app ) {
@@ -9,8 +9,8 @@ this.__proto__ = new EE()
 
 this.on( 'new application',
 function( application ) {
-if( IM.applications.indexOf( application ) === -1 ) {
-IM.applications.push( application )
+if( AM.applications.indexOf( application ) === -1 ) {
+AM.applications.push( application )
 }
 }
 )
@@ -57,23 +57,7 @@ _in = inputIO.outputs[ mapping.input.name ],
 _out = outputIO.inputs[ mapping.output.name ],
 transform
 
-transform = ( function() {
-var inputMin = _in.min,
-inputMax = _in.max,
-inputRange = _in.max - _in.min,
-outputMin = _out.min,
-outputMax = _out.max,
-outputRange = _out.max - _out.min
-
-return function( value ) {
-var valueAsPercent = ( value - inputMin ) * inputRange,
-output = outputRange * valueAsPercent
-
-output += outputMin
-
-return output
-}
-})()
+transform = AM.createTransformFunction( _in, _out )
 
 inputIO.on(
 mapping.input.name,
@@ -90,11 +74,29 @@ this.emit( output )
 }, this )
 },
 
+createTransformFunction : function( _in, _out ) {
+var inputMin = _in.min,
+inputMax = _in.max,
+inputRange = _in.max - _in.min,
+outputMin = _out.min,
+outputMax = _out.max,
+outputRange = _out.max - _out.min
+
+return function( value ) {
+var valueAsPercent = ( value - inputMin ) * inputRange,
+output = outputRange * valueAsPercent
+
+output += outputMin
+
+return output
+}
+},
+
 testApp: [
 "var app = {",
 "  name:'test',",
 "  destinations: [",
-"    { type:'WebSocket', ip:'127.0.0.1', port:9080 },",
+"    { type:'WebSocket', ip:'127.0.0.1', port:9081 },",
 "    { type:'OSC', ip:'127.0.0.1', port:8081 }",
 "  ],",
 "  inputs: {",

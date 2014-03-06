@@ -80,14 +80,13 @@ WebSocket / OSC / MIDI etc. connection.
         if( !_.has( this.transports, properties.type ) ) {
           throw 'Requested transport ' + properties.type + ' not found while creating destination'
         }
-        console.log( "DESTINATION", properties.type )
+
         var destination = null
         switch( properties.type ) {
           case 'OSC':
             destination = this.transports[ 'OSC' ].sender( properties.ip, properties.port )
             break;
           case 'WebSocket':
-            console.log( 'WebSocket destination')
             destination = this.transports[ 'WebSocket' ].createServer( properties.port )
           default:
         }
