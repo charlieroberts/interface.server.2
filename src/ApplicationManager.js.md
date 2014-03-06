@@ -55,7 +55,7 @@ generate output using the *send* method of the destination.
             
               _.forIn( targets, function( input, key ) {
                 input.emit = function( _value ) {
-                  destination.send('/' + input.name , 'f', [ _value ] )
+                  destination.output('/' + input.name , 'f', [ _value ] )
                 }
               })
             }
@@ -129,7 +129,7 @@ sends a message to the output destination whenever the input signal changes.
         "var app = {",
         "  name:'test',",
         "  destinations: [",
-        "    { type:'OSC', ip:'127.0.0.1', port:8080 },",
+        "    { type:'WebSocket', ip:'127.0.0.1', port:9080 },",
         "    { type:'OSC', ip:'127.0.0.1', port:8081 }",        
         "  ],",
         "  inputs: {",

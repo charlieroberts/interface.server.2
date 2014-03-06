@@ -23,9 +23,14 @@ return oscin
 },
 sender: function( _port, _ip ) {
 var port = _port || 8080,
-ip   = _ip || '127.0.0.1'
+ip   = _ip || '127.0.0.1',
+sender = new omgosc.UdpSender( port, ip )
 
-return new omgosc.UdpSender( port, ip )
+sender.output = function( address, typetags, values ) {
+this.send( address, typetags, values )
+}
+
+return sender
 },
 
 close: function( name ) {

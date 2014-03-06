@@ -1,0 +1,18 @@
+<html>
+<head>
+  <title>Interface.Server 2 WebSocket Test</title>
+</head>
+<body></body>
+<script>
+  var socketString = 'ws://127.0.0.1:9080',
+      socket = new WebSocket( socketString )
+  
+  socket.onmessage = function (event) {
+    var data = JSON.parse( event.data )
+    console.log( data )
+    //alert( event.data )
+  }
+  
+  socket.onopen = function() { socket.send( 'TESTING' ) }
+</script>
+</html>

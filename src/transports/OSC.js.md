@@ -35,9 +35,14 @@ will be used. Return the newly opened socket for sending messages.
 
       sender: function( _port, _ip ) {
         var port = _port || 8080,
-            ip   = _ip || '127.0.0.1'
-            
-        return new omgosc.UdpSender( port, ip )
+            ip   = _ip || '127.0.0.1',
+            sender = new omgosc.UdpSender( port, ip )
+        
+        sender.output = function( address, typetags, values ) {
+          this.send( address, typetags, values )
+        }
+        
+        return sender
       },
 
 *close* Close a socket using an optional name argument. If no name argument is provided, all

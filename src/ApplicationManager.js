@@ -34,7 +34,7 @@ _destinations.push( destination )
 
 _.forIn( targets, function( input, key ) {
 input.emit = function( _value ) {
-destination.send('/' + input.name , 'f', [ _value ] )
+destination.output('/' + input.name , 'f', [ _value ] )
 }
 })
 }
@@ -94,7 +94,7 @@ testApp: [
 "var app = {",
 "  name:'test',",
 "  destinations: [",
-"    { type:'OSC', ip:'127.0.0.1', port:8080 },",
+"    { type:'WebSocket', ip:'127.0.0.1', port:9080 },",
 "    { type:'OSC', ip:'127.0.0.1', port:8081 }",
 "  ],",
 "  inputs: {",
