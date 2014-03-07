@@ -16,53 +16,58 @@ AM = module.exports = {
     )
     return this
   },
-  createApp: function( appString ) {
+  createApplicationWithText: function( appString ) {
     var io, destinations
     
     eval( appString )
+    app = new AM.Application( app )
     
-    app.__proto__ = new EE()
-    
-    app.io = new this.app.ioManager.IO({ inputs:app.inputs, outputs:app.outputs, name: app.name })
-    
-    app.destinations = this.createDestinationsForApp( app )
-    
-    _.forIn( app.mappings, function( mapping ) { AM.createMappingForApp( mapping, app ) } )
-    
-    
+ 
     this.emit( 'new application', app )
   },
-  
-  
-  createDestinationsForApp: function( app ) {
-    var destinations = []
-    for( var i = 0; i < app.destinations.length; i++ ) {
-      ( function() {
-        var _destination = app.destinations[ i ], 
-            targets      = _.where( app.io.inputs,  { destination: i } ),
-            destination  = null
-                      
-        destination = AM.app.transportManager.createDestination( _destination )
-      
-        if( destination !== null ) {
-          destinations.push( destination )
-        
-          _.forIn( targets, function( input, key ) {
-            input.emit = function( _value ) {
-              destination.output('/' + input.name , 'f', [ _value ] )
-            }
-          })
-        }
-        
-        app.on( 'close', destination.close.bind( destination ) )
-      })()
-    }
-    
-    return destinations
+  removeApplicationWithName : function( name ) {
+    var app = AM.applications[ name ]
+    app.emit( 'close' )
   },
   
-  createMappingForApp: function( mapping, app ) {
-    var inputIO, outputIO, _in, _out, transform, outputFunction
+  Application: function( properties) {
+    _.assign( this, properties )
+    
+    console.log( this.createDestination )
+    this.initialProperties = properties
+    
+    this.io = new AM.app.ioManager.IO({ inputs:this.inputs, outputs:this.outputs, name: this.name })
+    
+    this.destinations = _.map( this.destinations, this.createDestination, this )
+    
+    this.mappings = _.forIn( this.mappings, this.createMapping, this )
+  },
+}
+
+_.assign( AM.Application.prototype, {
+  
+        
+  createDestination: function( _destination ) {
+    var targets      = _.where( this.io.inputs,  { destination: 1 } ),
+        destination = AM.app.transportManager.createDestination( _destination )
+        
+    if( destination !== null ) {      
+      _.forIn( targets, function( input, key ) {
+        input.emit = function( _value ) {
+          destination.output('/' + input.name , 'f', [ _value ] )
+        }
+      })
+    }else{
+      throw 'A null destination was encountered';
+    }
+  
+    this.on( 'close', destination.close.bind( destination ) )
+    
+    return destination
+  },
+  
+  createMapping: function( mapping ) {
+    var inputIO, outputIO, _in, _out, transform, outputFunction, app = this
     inputIO  = AM.app.ioManager.devices[ mapping.input.io ]
     outputIO = AM.app.ioManager.devices[ mapping.output.io ]
     
@@ -71,9 +76,9 @@ AM = module.exports = {
     _in  = inputIO.outputs[ mapping.input.name  ]
     _out = outputIO.inputs[ mapping.output.name ]
   
-    transform = AM.createTransformFunction( _in, _out )
+    transform = this.createTransformFunction( _in, _out )
     
-    outputFunction = AM.createOutputFunction( mapping, transform ).bind( _out )
+    outputFunction = this.createOutputFunction( mapping, transform ).bind( _out )
         
     inputIO.on( mapping.input.name, outputFunction )
     mapping.input = inputIO
@@ -81,17 +86,7 @@ AM = module.exports = {
     app.on( 'close', function() { inputIO.removeListener( mapping.input.name, outputFunction ) })  
   },
   
-  createOutputFunction : function( mapping, transform ) {
-    return function( inputValue, previousInput ) { // 'this' will be bound to output app input...
-      var output = transform( inputValue )
-      
-      // TODO: is only one of these needed?
-      if( typeof this.expression    === 'function' ) output = this.expression( output )
-      if( typeof mapping.expression === 'function' ) output = mapping.expression( output )
-      
-      this.emit( output )
-    }
-  },
+  
   
   createTransformFunction : function( _in, _out ) {
     var inputMin = _in.min,
@@ -111,27 +106,17 @@ AM = module.exports = {
     } 
   },
   
-  removeApplicationWithName : function( name ) {
-    var app = AM.applications[ name ]
-    app.emit( 'close' )
+  createOutputFunction : function( mapping, transform ) {
+    return function( inputValue, previousInput ) { // 'this' will be bound to output app input...
+      var output = transform( inputValue )
+      
+      // TODO: is only one of these needed?
+      if( typeof this.expression    === 'function' ) output = this.expression( output )
+      if( typeof mapping.expression === 'function' ) output = mapping.expression( output )
+      
+      this.emit( output )
+    }
   },
-  
-  testApp: [
-    "var app = {",
-    "  name:'test',",
-    "  destinations: [",
-    "    { type:'ZeroMQ', ip:'127.0.0.1', port:10080 },",
-    //"    { type:'WebSocket', ip:'127.0.0.1', port:9081 },",
-    "    { type:'OSC', ip:'127.0.0.1', port:8081 }",        
-    "  ],",
-    "  inputs: {",
-    "    blah:  { name:'blah', min: 200, max: 300, destination: 0, expression: function( v ) { return v * 4 } },",
-    "    blah2: { name:'blah2', min: 0, max: 1, destination: 1 }",
-    "  },",
-    "  mappings: [",
-    "    { input: { io:'USB 2-Axis 8-Button Gamepad', name:'Button1' }, output:{ io:'test', name:'blah'  }, expression: function( v ) { return v * .33 } },",
-    "    { input: { io:'USB 2-Axis 8-Button Gamepad', name:'Button2' }, output:{ io:'test', name:'blah2' } }",
-    "  ]",
-    "}"
-  ].join('\n'),
-}
+})
+
+AM.Application.prototype.__proto__ = new EE()

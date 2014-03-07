@@ -20,8 +20,9 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
       },
       
       '/interface/createApplicationWithText': function( text ) {
-        App.applicationManager.createApp( text )
+        App.applicationManager.createApplicationWithText( text )
       },
+      
       '/interface/removeApplicationWithName': function( name ) {
         App.applicationManager.removeApplicationWithName( name )
       },

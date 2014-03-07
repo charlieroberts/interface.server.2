@@ -1,7 +1,7 @@
 main.js
 =======
 
-    var _ = require( 'lodash' ), EE = require('events').EventEmitter,
+    var _ = require( 'lodash' ), EE = require('events').EventEmitter, testApp,
 
     IS2 = {
       ioManager: null,
@@ -15,8 +15,30 @@ main.js
         this.transportManager   = require( './transports/TransportManager.js' ).init( this )        
         this.applicationManager = require( './ApplicationManager.js' ).init( this )
         
-        setTimeout( this.applicationManager.createApp.bind( this.applicationManager, this.applicationManager.testApp ), 1000 )
+        setTimeout( this.applicationManager.createApplicationWithText.bind( this.applicationManager, testApp ), 1000 )
       }
     }
+        
+*testApp* is a dummy app string to use for testing purposes
+
+    testApp = [
+      "var app = {",
+      "  name:'test',",
+      "  destinations: [",
+      //"    { type:'ZeroMQ', ip:'127.0.0.1', port:10080 },",
+      "    { type:'WebSocket', ip:'127.0.0.1', port:9081 },",
+      "    { type:'OSC', ip:'127.0.0.1', port:8081 }",        
+      "  ],",
+      "  inputs: {",
+      "    blah:  { name:'blah', min: 200, max: 300, destination: 1, expression: function( v ) { return v * 4 } },",
+      "    blah2: { name:'blah2', min: 0, max: 1, destination: 1 }",
+      "  },",
+      "  mappings: [",
+      "    { input: { io:'USB 2-Axis 8-Button Gamepad', name:'Button1' }, output:{ io:'test', name:'blah'  }, expression: function( v ) { return v * .33 } },",
+      "    { input: { io:'USB 2-Axis 8-Button Gamepad', name:'Button2' }, output:{ io:'test', name:'blah2' } }",
+      "  ]",
+      "}"
+    ].join('\n')
     
     IS2.init()
+    
