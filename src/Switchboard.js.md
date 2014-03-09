@@ -26,4 +26,13 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
       '/interface/removeApplicationWithName': function( name ) {
         App.applicationManager.removeApplicationWithName( name )
       },
+
+      // TODO: should be: /interface/test/blah/setMin 100
+      '/interface/changeInputPropertyForApplication': function( applicationName, inputName, propertyName, newValue ) {
+        var app = App.applicationManager.applications[ applicationName ],
+            input = app.inputs[ inputName ]
+            
+        input[ propertyName ] = newValue
+        console.log( propertyName, input[ propertyName ] )
+      },
     }

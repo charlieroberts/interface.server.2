@@ -12,7 +12,7 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
 
 *interfaces* is an dictionary of all currently running interfaces in Interface.Server.
 
-      applications: [],
+      applications: {},
       
       init: function( app ) {
         this.app = app
@@ -59,7 +59,7 @@ Emit an event telling the ApplicationManager listeners that a new application ha
         
         this.destinations = _.map( this.destinations, this.createDestination, this )
         
-        this.mappings = _.forIn( this.mappings, this.createMapping, this )
+        this.mappings = _.map( this.mappings, this.createMapping, this )
       },
     }
     
@@ -90,9 +90,11 @@ Find all app inputs that use each destination and bind their emit function to ge
 between the input range and the output range. Add a listener to the input object that sends a message to the output destination 
 whenever the input signal changes.
 
-      createMapping: function( mapping ) {
+      createMapping: function( mapping, key ) {
         var inputIO, outputIO, _in, _out, transform, outputFunction, app = this
-
+        
+        console.log( "MIO", mapping.input.io )
+        //inputIO  = typeof mapping.input.io === 'string' ? AM.app.ioManager.devices[ mapping.input.io ] : mapping.input
         inputIO  = AM.app.ioManager.devices[ mapping.input.io ]
         outputIO = AM.app.ioManager.devices[ mapping.output.io ]
         
@@ -103,40 +105,41 @@ whenever the input signal changes.
       
         transform = this.createTransformFunction( _in, _out )
         
-        outputFunction = this.createOutputFunction( mapping, transform ).bind( _out )
+        outputFunction = this.createOutputFunction( mapping ).bind( _out )
             
         inputIO.on( mapping.input.name, outputFunction )
-        mapping.input = inputIO
+        mapping.inputControl = _in
+        mapping.outputControl = _out
+        mapping.outputFunction = outputFunction
+        mapping.transform = transform
         
         app.on( 'close', function() { inputIO.removeListener( mapping.input.name, outputFunction ) })  
+        
+        return mapping
       },
       
 *createTransformFunction* get input / output mins maxs and ranges and create function using them to calculate affine
 transform.      
       
-      createTransformFunction : function( _in, _out ) {
-        var inputMin = _in.min,
-            inputMax = _in.max,
-            inputRange = _in.max - _in.min,
-            outputMin = _out.min,
-            outputMax = _out.max,
-            outputRange = _out.max - _out.min
-        
+      createTransformFunction : function( _in, _out ) {        
         return function( value ) {
-          var valueAsPercent = ( value - inputMin ) * inputRange,
+          var _in = this.inputControl, _out = this.outputControl, 
+              inputRange = _in.max - _in.min,
+              outputRange = _out.max - _out.min,
+              valueAsPercent = ( value - _in.min ) * inputRange,
               output = outputRange * valueAsPercent
               
-          output += outputMin
+          output += _out.min
           
           return output
-        } 
+        }
       },
 
 *createOutputFunction* call transform function and then apply end-user expressions as needed.
       
-      createOutputFunction : function( mapping, transform ) {
+      createOutputFunction : function( mapping ) {
         return function( inputValue, previousInput ) { // 'this' will be bound to output app input...
-          var output = transform( inputValue )
+          var output = mapping.transform( inputValue )
           
           // TODO: is only one of these needed?
           if( typeof this.expression    === 'function' ) output = this.expression( output )

@@ -1,6 +1,6 @@
 var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter,
 AM = module.exports = {
-  applications: [],
+  applications: {},
   
   init: function( app ) {
     this.app = app
@@ -33,18 +33,42 @@ AM = module.exports = {
   Application: function( properties) {
     _.assign( this, properties )
     
-    console.log( this.createDestination )
     this.initialProperties = properties
     
     this.io = new AM.app.ioManager.IO({ inputs:this.inputs, outputs:this.outputs, name: this.name })
     
     this.destinations = _.map( this.destinations, this.createDestination, this )
     
-    this.mappings = _.forIn( this.mappings, this.createMapping, this )
+    this.mappings = _.map( this.mappings, this.createMapping, this )
+    
+    //_.each( this.inputs, this.gettersAndSetters, this )
   },
 }
 
 _.assign( AM.Application.prototype, {
+  gettersAndSetters: function( input, key ) {
+    var _min = input.min, _max = input.max, _expression = input.expression, app = this, mapping
+    
+    for( var i = 0; i < app.mappings.length; i++ ) {
+      var _mapping = app.mappings[ i ]
+      if( _mapping.output.name === key ) {
+        mapping = _mapping
+    
+        break;
+      }
+    }
+    Object.defineProperties( input, {
+      min: {
+        get: function() { return _min },
+        set: function(v) { _min = v; } 
+      },
+      max: {
+        get: function() { return _max },
+        set: function(v) { _max = v; }
+      },
+      
+    })
+  },
   
         
   createDestination: function( _destination ) {
@@ -66,8 +90,11 @@ _.assign( AM.Application.prototype, {
     return destination
   },
   
-  createMapping: function( mapping ) {
+  createMapping: function( mapping, key ) {
     var inputIO, outputIO, _in, _out, transform, outputFunction, app = this
+    
+    console.log( "MIO", mapping.input.io )
+    //inputIO  = typeof mapping.input.io === 'string' ? AM.app.ioManager.devices[ mapping.input.io ] : mapping.input
     inputIO  = AM.app.ioManager.devices[ mapping.input.io ]
     outputIO = AM.app.ioManager.devices[ mapping.output.io ]
     
@@ -78,37 +105,38 @@ _.assign( AM.Application.prototype, {
   
     transform = this.createTransformFunction( _in, _out )
     
-    outputFunction = this.createOutputFunction( mapping, transform ).bind( _out )
+    outputFunction = this.createOutputFunction( mapping ).bind( _out )
         
     inputIO.on( mapping.input.name, outputFunction )
-    mapping.input = inputIO
+    mapping.inputControl = _in
+    mapping.outputControl = _out
+    mapping.outputFunction = outputFunction
+    mapping.transform = transform
     
     app.on( 'close', function() { inputIO.removeListener( mapping.input.name, outputFunction ) })  
+    
+    return mapping
   },
   
   
   
-  createTransformFunction : function( _in, _out ) {
-    var inputMin = _in.min,
-        inputMax = _in.max,
-        inputRange = _in.max - _in.min,
-        outputMin = _out.min,
-        outputMax = _out.max,
-        outputRange = _out.max - _out.min
-    
+  createTransformFunction : function( _in, _out ) {        
     return function( value ) {
-      var valueAsPercent = ( value - inputMin ) * inputRange,
+      var _in = this.inputControl, _out = this.outputControl, 
+          inputRange = _in.max - _in.min,
+          outputRange = _out.max - _out.min,
+          valueAsPercent = ( value - _in.min ) * inputRange,
           output = outputRange * valueAsPercent
           
-      output += outputMin
+      output += _out.min
       
       return output
-    } 
+    }
   },
   
-  createOutputFunction : function( mapping, transform ) {
+  createOutputFunction : function( mapping ) {
     return function( inputValue, previousInput ) { // 'this' will be bound to output app input...
-      var output = transform( inputValue )
+      var output = mapping.transform( inputValue )
       
       // TODO: is only one of these needed?
       if( typeof this.expression    === 'function' ) output = this.expression( output )

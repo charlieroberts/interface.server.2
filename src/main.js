@@ -10,8 +10,14 @@ IS2 = {
     this.ioManager          = require( './io/IOManager.js' ).init( this )
     this.transportManager   = require( './transports/TransportManager.js' ).init( this )        
     this.applicationManager = require( './ApplicationManager.js' ).init( this )
+    this.switchboard        = require( './Switchboard.js' ).init( this )
     
-    setTimeout( this.applicationManager.createApplicationWithText.bind( this.applicationManager, testApp ), 1000 )
+    
+    setTimeout( function() {
+      IS2.applicationManager.createApplicationWithText( testApp )
+      //'/interface/changeMappingPropertyForApplication': function( applicationName, mappingName, propertyName, newValue ) {
+      IS2.switchboard[ '/interface/changeInputPropertyForApplication' ]( 'test', 'blah', 'min', 0 )
+    }, 1000 )
   }
 }
     
@@ -35,3 +41,4 @@ testApp = [
 ].join('\n')
 
 IS2.init()
+global.IS2 = IS2
