@@ -40,35 +40,10 @@ AM = module.exports = {
     this.destinations = _.map( this.destinations, this.createDestination, this )
     
     this.mappings = _.map( this.mappings, this.createMapping, this )
-    
-    //_.each( this.inputs, this.gettersAndSetters, this )
   },
 }
 
 _.assign( AM.Application.prototype, {
-  gettersAndSetters: function( input, key ) {
-    var _min = input.min, _max = input.max, _expression = input.expression, app = this, mapping
-    
-    for( var i = 0; i < app.mappings.length; i++ ) {
-      var _mapping = app.mappings[ i ]
-      if( _mapping.output.name === key ) {
-        mapping = _mapping
-    
-        break;
-      }
-    }
-    Object.defineProperties( input, {
-      min: {
-        get: function() { return _min },
-        set: function(v) { _min = v; } 
-      },
-      max: {
-        get: function() { return _max },
-        set: function(v) { _max = v; }
-      },
-      
-    })
-  },
   
         
   createDestination: function( _destination ) {

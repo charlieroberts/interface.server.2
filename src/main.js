@@ -14,10 +14,12 @@ IS2 = {
     
     
     setTimeout( function() {
-      IS2.applicationManager.createApplicationWithText( testApp )
+      this.applicationManager.createApplicationWithText( testApp )
       //'/interface/changeMappingPropertyForApplication': function( applicationName, mappingName, propertyName, newValue ) {
-      IS2.switchboard[ '/interface/changeInputPropertyForApplication' ]( 'test', 'blah', 'min', 0 )
-    }, 1000 )
+      //this.switchboard[ '/interface/changeInputPropertyForApplication' ]( 'test', 'blah', 'min', 0 )
+      
+      this.switchboard.route( '/interface/applications/test/inputs/blah/min', 0 )
+    }.bind(this), 1000 )
   }
 }
     
