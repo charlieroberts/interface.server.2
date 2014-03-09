@@ -59,23 +59,4 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
         
         return output
       },
-      
-      '/interface/createApplicationWithText': function( text ) {
-        IS2.applicationManager.createIS2licationWithText( text )
-      },
-      
-      '/interface/removeApplicationWithName': function( name ) {
-        IS2.applicationManager.removeIS2licationWithName( name )
-      },
-
-      // TODO: should be: /interface/test/blah/setMin 100
-      '/interface/changeInputPropertyForApplication': function( applicationName, inputName, propertyName, newValue ) {
-        var app = IS2.applicationManager.applications[ applicationName ],
-            input = app.inputs[ inputName ]
-            
-        input[ propertyName ] = newValue
-        console.log( propertyName, input[ propertyName ] )
-      },
     }
-    
-    // /interface/applications/blah/min 100

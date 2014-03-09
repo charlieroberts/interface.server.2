@@ -18,7 +18,7 @@ IS2 = {
       //'/interface/changeMappingPropertyForApplication': function( applicationName, mappingName, propertyName, newValue ) {
       //this.switchboard[ '/interface/changeInputPropertyForApplication' ]( 'test', 'blah', 'min', 0 )
       
-      this.switchboard.route( '/interface/applications/test/inputs/blah/min', 0 )
+      this.switchboard.route( '/interface/applicationManager/alert', 0 )
     }.bind(this), 1000 )
   }
 }
