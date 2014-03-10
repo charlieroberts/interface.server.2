@@ -6,18 +6,27 @@ OSC = module.exports = {
   
   init: function( app ) {
     this.app = app      
-    
-    EE = require( 'events' ).EventEmitter
+    this.__proto__ = new (require( 'events' ).EventEmitter)()
     
     omgosc = require( 'omgosc' )
+    
+    // remote handles input OSC messages for remote control
+    this.remote = this.receiver( 8081, 'remote' )
   },
   
   
   receiver: function( port, _name ) {
-    var oscin = new omgosc.UdpReceiver( port || 8080 ),
+    var oscin = new omgosc.UdpReceiver( port || 8081 ),
         name = _name || oscInputCount++
     
     this.receivers[ name ] = oscin
+    oscin.on('', function( args ) {    // path, typetags, params 
+      args.params.unshift( args.path ) // switchboard.route accepts one array argument with path at beginning
+      var shouldReply = OSC.app.switchboard.route.apply( OSC.app.switchboard, args.params )
+      if( shouldReply ) {
+        // TODO: where should the result be sent to???
+      }
+    })
     
     return oscin
   },

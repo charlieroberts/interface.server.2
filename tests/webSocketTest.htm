@@ -9,10 +9,11 @@
   
   socket.onmessage = function (event) {
     var data = JSON.parse( event.data )
-    console.log( data )
-    //alert( event.data )
+    alert( "RESPONSE: " + data.value )
   }
   
-  socket.onopen = function() { socket.send( 'TESTING' ) }
+  socket.onopen = function() { 
+    socket.send( JSON.stringify({ path:'/interface/applications/test/inputs/blah/max', params:[] }) ) 
+  }
 </script>
 </html>

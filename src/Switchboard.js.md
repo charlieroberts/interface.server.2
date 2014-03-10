@@ -7,9 +7,9 @@ forwarded to the Switchboard for processing.
 
 _ is our lo-dash reference, while HID refers to the node HID module, https://www.npmjs.org/package/node-hid.
 
-    var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter, IS2
+    var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter, IS2,
 		
-    Switch = module.exports = {
+    SB = module.exports = {
       
       init: function( app ) {
         IS2 = app
@@ -31,29 +31,30 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
             msg  = args[ 0 ],
             msgArgs = args.slice( 1 ),
             components = msg.split( '/' ).slice( 2 ), // first should be empty, second is 'interface'
-            output = null // return null if this is not a getter call
-        
-        console.log( components )
-
-        var i = 1, processing = IS2[ components[0] ], tProcessing = 'object', found = null, lastObject = null
-        while( i < components.length && tProcessing === 'object' ) {
-          lastObject = processing
-          processing = processing[ components[ i ] ]
-          tProcessing = typeof processing
+            output = null, // return null if this is not a getter call
+            i = 1, 
+            value = IS2[ components[0] ],
+            tValue = 'object',
+            found = null, lastObject = null
+            
+        while( i < components.length && tValue === 'object' ) {
+          lastObject = value
+          value = value[ components[ i ] ]
+          tValue = typeof value
           i++
         }
 
-        if( typeof processing === 'function' ) {
+        if( typeof value === 'function' ) {
           if( msgArgs.length ) {
-            processing.apply( lastObject, msgArgs )
+            value.apply( lastObject, msgArgs )
           }else{
-            output = processing()
+            output = value()
           }
         }else{
           if( msgArgs.length ) {
-            lastObject[ components[ i - 1] ] = msgArgs[ 0 ]
+            lastObject[ components[ i - 1 ] ] = msgArgs[ 0 ]
           }else{
-            output = lastObject[ components[ i - 1] ]
+            output = lastObject[ components[ i - 1 ] ]
           }
         }
         

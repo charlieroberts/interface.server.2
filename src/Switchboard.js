@@ -1,5 +1,5 @@
-var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter, IS2
-Switch = module.exports = {
+var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter, IS2,
+SB = module.exports = {
   
   init: function( app ) {
     IS2 = app
@@ -20,48 +20,32 @@ Switch = module.exports = {
         msg  = args[ 0 ],
         msgArgs = args.slice( 1 ),
         components = msg.split( '/' ).slice( 2 ), // first should be empty, second is 'interface'
-        output = null // return null if this is not a getter call
-    
-    console.log( components )
-    var i = 1, processing = IS2[ components[0] ], tProcessing = 'object', found = null, lastObject = null
-    while( i < components.length && tProcessing === 'object' ) {
-      lastObject = processing
-      processing = processing[ components[ i ] ]
-      tProcessing = typeof processing
+        output = null, // return null if this is not a getter call
+        i = 1, 
+        value = IS2[ components[0] ],
+        tValue = 'object',
+        found = null, lastObject = null
+        
+    while( i < components.length && tValue === 'object' ) {
+      lastObject = value
+      value = value[ components[ i ] ]
+      tValue = typeof value
       i++
     }
-    if( typeof processing === 'function' ) {
+    if( typeof value === 'function' ) {
       if( msgArgs.length ) {
-        processing.apply( lastObject, msgArgs )
+        value.apply( lastObject, msgArgs )
       }else{
-        output = processing()
+        output = value()
       }
     }else{
       if( msgArgs.length ) {
-        lastObject[ components[ i - 1] ] = msgArgs[ 0 ]
+        lastObject[ components[ i - 1 ] ] = msgArgs[ 0 ]
       }else{
-        output = lastObject[ components[ i - 1] ]
+        output = lastObject[ components[ i - 1 ] ]
       }
     }
     
     return output
   },
-  
-  '/interface/createApplicationWithText': function( text ) {
-    IS2.applicationManager.createIS2licationWithText( text )
-  },
-  
-  '/interface/removeApplicationWithName': function( name ) {
-    IS2.applicationManager.removeIS2licationWithName( name )
-  },
-  // TODO: should be: /interface/test/blah/setMin 100
-  '/interface/changeInputPropertyForApplication': function( applicationName, inputName, propertyName, newValue ) {
-    var app = IS2.applicationManager.applications[ applicationName ],
-        input = app.inputs[ inputName ]
-        
-    input[ propertyName ] = newValue
-    console.log( propertyName, input[ propertyName ] )
-  },
 }
-
-// /interface/applications/blah/min 100

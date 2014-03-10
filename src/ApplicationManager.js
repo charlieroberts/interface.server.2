@@ -2,8 +2,6 @@ var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter,
 AM = module.exports = {
   applications: {},
   
-  alert: function() { console.log( ' ALERT ') },
-  
   init: function( app ) {
     this.app = app
     

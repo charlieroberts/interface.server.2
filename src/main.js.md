@@ -19,10 +19,7 @@ main.js
         
         setTimeout( function() {
           this.applicationManager.createApplicationWithText( testApp )
-          //'/interface/changeMappingPropertyForApplication': function( applicationName, mappingName, propertyName, newValue ) {
-          //this.switchboard[ '/interface/changeInputPropertyForApplication' ]( 'test', 'blah', 'min', 0 )
-          
-          this.switchboard.route( '/interface/applicationManager/alert', 0 )
+          this.switchboard.route( '/interface/applications/test/inputs/blah/min', 0 )
         }.bind(this), 1000 )
       }
     }
@@ -35,7 +32,7 @@ main.js
       "  destinations: [",
       //"    { type:'ZeroMQ', ip:'127.0.0.1', port:10080 },",
       "    { type:'WebSocket', ip:'127.0.0.1', port:9081 },",
-      "    { type:'OSC', ip:'127.0.0.1', port:8081 }",        
+      "    { type:'OSC', ip:'127.0.0.1', port:8082 }",        
       "  ],",
       "  inputs: {",
       "    blah:  { name:'blah', min: 200, max: 300, destination: 1, expression: function( v ) { return v * 4 } },",

@@ -59,8 +59,12 @@ _ is our lo-dash reference; this object also relies on the node ws module: https
         this.clients[ client.ip ] = WS.clients[ client.ip ] = client
         
         client.on( 'message', function( msg ) {
-          console.log( 'WS MSG:', msg )
-          client.send( JSON.stringify( { handshake: true } ) )
+          msg = JSON.parse( msg )
+          msg.params.unshift( msg.path ) // switchboard.route accepts one array argument with path at beginning
+          var response = WS.app.switchboard.route.apply( WS.app.switchboard, msg.params )
+          if( response !== null ) {
+            client.send( JSON.stringify({ 'path': msg.path, value:response }) )
+          }
         })
         
         client.on( 'close', function() {
