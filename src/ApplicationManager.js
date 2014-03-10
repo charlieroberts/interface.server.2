@@ -56,30 +56,40 @@ _.assign( AM.Application.prototype, {
   createMapping: function( mapping, key ) {
     var inputIO, outputIO, _in, _out, transform, outputFunction, app = this, destinations
     
-    //console.log( "APP D", app.destinations )
     inputIO  = AM.app.ioManager.devices[ mapping.input.io ]
-    outputIO = AM.app.ioManager.devices[ mapping.output.io ]
     
     if( typeof inputIO === 'undefined' ) { throw 'ERROR: Input IO device ' + mapping.input.io + ' is not found.' }
     
-    _in  = inputIO.outputs[ mapping.input.name  ]
-    _out = outputIO.inputs[ mapping.output.name ]
+    _in  = inputIO.outputs[ mapping.input.name ]
     
-    _out.__proto__ = new EE()
-  
-    transform = this.createTransformFunction( _in, _out )
+    if( mapping.output ) {
+      outputIO = AM.app.ioManager.devices[ mapping.output.io ]
+      
+      _out = outputIO.inputs[ mapping.output.name ]
+      _out.__proto__ = new EE()
+      
+      transform = this.createTransformFunction( _in, _out )
     
-    outputFunction = this.createOutputFunctionForMapping( mapping ).bind( _out )
+      outputFunction = this.createOutputFunctionForMapping( mapping ).bind( _out )
+      
+      mapping.outputControl = _out
+      mapping.outputFunction = outputFunction
+      mapping.transformFunction = transform
+      mapping.transform = typeof mapping.transform !== 'undefined' ? mapping.transform : true
+      
+    }else if( mapping.expression ){
+      outputFunction = function( inputValue) {
+        return mapping.expression( inputValue )
+      }
+    }else{
+      return 
+    }
         
     inputIO.on( mapping.input.name, outputFunction )
     
-    
     mapping.inputControl = _in
-    mapping.outputControl = _out
-    mapping.outputFunction = outputFunction
-    mapping.transform = transform
     
-    this.linkMappingOutputToDestinations( mapping, destinations )
+    if( mapping.output ) this.linkMappingOutputToDestinations( mapping, destinations )
     app.on( 'close', function() { inputIO.removeListener( mapping.input.name, outputFunction ) })  
     
     return mapping
@@ -103,10 +113,10 @@ _.assign( AM.Application.prototype, {
   
   createOutputFunctionForMapping : function( mapping ) {
     return function( inputValue, previousInput ) { // 'this' will be bound to output app input...
-      var output = mapping.transform( inputValue )
+      var output = mapping.transform ? mapping.transformFunction( inputValue ) : inputValue
       
       // TODO: is only one of these needed?
-      if( typeof this.expression    === 'function' ) output = this.expression( output )
+      // if( typeof this.expression    === 'function' ) output = this.expression( output )
       if( typeof mapping.expression === 'function' ) output = mapping.expression( output )
       
       this.emit( 'value', output )
