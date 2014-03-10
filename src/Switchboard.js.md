@@ -22,8 +22,8 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
         })
         
         this.__proto__ = new EE()
-
-        return this
+        
+        return this;
       },
       
       route : function() {

@@ -31,7 +31,7 @@ WS = module.exports = {
     server.output = function( path, typetags, values ) { // TODO: you should be able to target individual clients
       for( var i = 0; i < server.clients.length; i++ ) {
         var client = server.clients[ i ]
-        client.send( JSON.stringify({ 'path': path, 'value':values }) )
+        client.send( JSON.stringify({ 'key': path, 'values': Array.isArray( values ) ? values : [ values ] }) )
       }
     }
     
@@ -48,10 +48,10 @@ WS = module.exports = {
     
     client.on( 'message', function( msg ) {
       msg = JSON.parse( msg )
-      msg.params.unshift( msg.path ) // switchboard.route accepts one array argument with path at beginning
-      var response = WS.app.switchboard.route.apply( WS.app.switchboard, msg.params )
+      msg.values.unshift( msg.key ) // switchboard.route accepts one array argument with path at beginning
+      var response = WS.app.switchboard.route.apply( WS.app.switchboard, msg.values )
       if( response !== null ) {
-        client.send( JSON.stringify({ 'path': msg.path, value:response }) )
+        client.send( JSON.stringify({ 'key': msg.path, 'values':[ response ] }) )
       }
     })
     

@@ -43,7 +43,7 @@ _ is our lo-dash reference; this object also relies on the node ws module: https
         server.clients = {}
         
         server.output = function( path, typetags, values ) { // TODO: you should be able to target individual clients
-          this.send( JSON.stringify({ 'path': path, 'value':values }) )
+          this.send( JSON.stringify({ 'key': path, 'values':values }) )
         }
         
         ZMQ.servers[ port ] = server

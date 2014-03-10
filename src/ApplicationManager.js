@@ -38,7 +38,6 @@ AM = module.exports = {
     this.io = new AM.app.ioManager.IO({ inputs:this.inputs, outputs:this.outputs, name: this.name })
     
     this.destinations = _.map( this.destinations, this.createDestination, this )
-    
     this.mappings = _.map( this.mappings, this.createMapping, this )
   },
 }
@@ -46,19 +45,8 @@ AM = module.exports = {
 _.assign( AM.Application.prototype, {
   
         
-  createDestination: function( _destination ) {
-    var targets      = _.where( this.io.inputs,  { destination: 1 } ),
-        destination = AM.app.transportManager.createDestination( _destination )
-        
-    if( destination !== null ) {      
-      _.forIn( targets, function( input, key ) {
-        input.emit = function( _value ) {
-          destination.output('/' + input.name , 'f', [ _value ] )
-        }
-      })
-    }else{
-      throw 'A null destination was encountered';
-    }
+  createDestination: function( _destination, key ) {
+    var destination = AM.app.transportManager.createDestination( _destination )
   
     this.on( 'close', destination.close.bind( destination ) )
     
@@ -66,10 +54,9 @@ _.assign( AM.Application.prototype, {
   },
   
   createMapping: function( mapping, key ) {
-    var inputIO, outputIO, _in, _out, transform, outputFunction, app = this
+    var inputIO, outputIO, _in, _out, transform, outputFunction, app = this, destinations
     
-    console.log( "MIO", mapping.input.io )
-    //inputIO  = typeof mapping.input.io === 'string' ? AM.app.ioManager.devices[ mapping.input.io ] : mapping.input
+    //console.log( "APP D", app.destinations )
     inputIO  = AM.app.ioManager.devices[ mapping.input.io ]
     outputIO = AM.app.ioManager.devices[ mapping.output.io ]
     
@@ -77,17 +64,22 @@ _.assign( AM.Application.prototype, {
     
     _in  = inputIO.outputs[ mapping.input.name  ]
     _out = outputIO.inputs[ mapping.output.name ]
+    
+    _out.__proto__ = new EE()
   
     transform = this.createTransformFunction( _in, _out )
     
-    outputFunction = this.createOutputFunction( mapping ).bind( _out )
+    outputFunction = this.createOutputFunctionForMapping( mapping ).bind( _out )
         
     inputIO.on( mapping.input.name, outputFunction )
+    
+    
     mapping.inputControl = _in
     mapping.outputControl = _out
     mapping.outputFunction = outputFunction
     mapping.transform = transform
     
+    this.linkMappingOutputToDestinations( mapping, destinations )
     app.on( 'close', function() { inputIO.removeListener( mapping.input.name, outputFunction ) })  
     
     return mapping
@@ -109,7 +101,7 @@ _.assign( AM.Application.prototype, {
     }
   },
   
-  createOutputFunction : function( mapping ) {
+  createOutputFunctionForMapping : function( mapping ) {
     return function( inputValue, previousInput ) { // 'this' will be bound to output app input...
       var output = mapping.transform( inputValue )
       
@@ -117,7 +109,34 @@ _.assign( AM.Application.prototype, {
       if( typeof this.expression    === 'function' ) output = this.expression( output )
       if( typeof mapping.expression === 'function' ) output = mapping.expression( output )
       
-      this.emit( output )
+      this.emit( 'value', output )
+    }
+  },
+  
+  linkMappingOutputToDestinations: function( mapping ) {
+    var destinations
+    
+    if( Array.isArray( mapping.outputControl.destinations) ) {
+      destinations = []
+      for( var i = 0; i < mapping.outputControl.destinations.length; i++ ) {
+        destinations[ i ] = this.destinations[ mapping.outputControl.destinations[ i ] ]
+      }
+    }else{
+      destinations = mapping.outputControl.destinations !== -1 ? [ this.destinations[ mapping.outputControl.destinations ] ] : this.destinations
+    }
+    
+    for( var i = 0; i < destinations.length; i++ ) {
+      ( function() {
+        var destination = destinations[ i ]
+    
+        if( _.isObject( destination ) ) {
+          mapping.outputControl.on( 'value', function( _value ) {
+            destination.output( '/' + mapping.input.name , 'f', [ _value ] )
+          })
+        }else{
+          throw 'A null destination was encountered';
+        }
+      })()
     }
   },
 })

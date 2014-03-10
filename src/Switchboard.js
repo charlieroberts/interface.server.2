@@ -12,7 +12,8 @@ SB = module.exports = {
     })
     
     this.__proto__ = new EE()
-    return this
+    
+    return this;
   },
   
   route : function() {

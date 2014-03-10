@@ -58,7 +58,7 @@ Emit an event telling the ApplicationManager listeners that a new application ha
         this.io = new AM.app.ioManager.IO({ inputs:this.inputs, outputs:this.outputs, name: this.name })
         
         this.destinations = _.map( this.destinations, this.createDestination, this )
-        
+
         this.mappings = _.map( this.mappings, this.createMapping, this )
       },
     }
@@ -67,19 +67,8 @@ Emit an event telling the ApplicationManager listeners that a new application ha
       
 Find all app inputs that use each destination and bind their emit function to generate output using the *output* method of the destination. 
             
-      createDestination: function( _destination ) {
-        var targets      = _.where( this.io.inputs,  { destination: 1 } ),
-            destination = AM.app.transportManager.createDestination( _destination )
-            
-        if( destination !== null ) {      
-          _.forIn( targets, function( input, key ) {
-            input.emit = function( _value ) {
-              destination.output('/' + input.name , 'f', [ _value ] )
-            }
-          })
-        }else{
-          throw 'A null destination was encountered';
-        }
+      createDestination: function( _destination, key ) {
+        var destination = AM.app.transportManager.createDestination( _destination )
       
         this.on( 'close', destination.close.bind( destination ) )
         
@@ -91,10 +80,9 @@ between the input range and the output range. Add a listener to the input object
 whenever the input signal changes.
 
       createMapping: function( mapping, key ) {
-        var inputIO, outputIO, _in, _out, transform, outputFunction, app = this
+        var inputIO, outputIO, _in, _out, transform, outputFunction, app = this, destinations
         
-        console.log( "MIO", mapping.input.io )
-        //inputIO  = typeof mapping.input.io === 'string' ? AM.app.ioManager.devices[ mapping.input.io ] : mapping.input
+        //console.log( "APP D", app.destinations )
         inputIO  = AM.app.ioManager.devices[ mapping.input.io ]
         outputIO = AM.app.ioManager.devices[ mapping.output.io ]
         
@@ -102,17 +90,24 @@ whenever the input signal changes.
         
         _in  = inputIO.outputs[ mapping.input.name  ]
         _out = outputIO.inputs[ mapping.output.name ]
+        
+        _out.__proto__ = new EE()
       
         transform = this.createTransformFunction( _in, _out )
         
-        outputFunction = this.createOutputFunction( mapping ).bind( _out )
+        outputFunction = this.createOutputFunctionForMapping( mapping ).bind( _out )
             
         inputIO.on( mapping.input.name, outputFunction )
+        
+These properties are added to our mapping object so that they can be accessed and changed later on via remote messaging.
+        
         mapping.inputControl = _in
         mapping.outputControl = _out
         mapping.outputFunction = outputFunction
         mapping.transform = transform
         
+        this.linkMappingOutputToDestinations( mapping, destinations )
+
         app.on( 'close', function() { inputIO.removeListener( mapping.input.name, outputFunction ) })  
         
         return mapping
@@ -135,9 +130,10 @@ transform.
         }
       },
 
-*createOutputFunction* call transform function and then apply end-user expressions as needed.
+*createOutputFunctionForMapping* call transform function and then applies end-user expressions as needed. Finally, it emits the *value* event,
+which causes the mapping object to forward the resulting value to all its destinations.
       
-      createOutputFunction : function( mapping ) {
+      createOutputFunctionForMapping : function( mapping ) {
         return function( inputValue, previousInput ) { // 'this' will be bound to output app input...
           var output = mapping.transform( inputValue )
           
@@ -145,7 +141,37 @@ transform.
           if( typeof this.expression    === 'function' ) output = this.expression( output )
           if( typeof mapping.expression === 'function' ) output = mapping.expression( output )
           
-          this.emit( output )
+          this.emit( 'value', output )
+        }
+      },
+      
+*linkMappingOutputToDestinations* For every destination in the mappings output, register an event that forwards value messages to it. The destination
+value can be a single array index, an array of indices, or -1 to indicate use of all destinations.
+
+      linkMappingOutputToDestinations: function( mapping ) {
+        var destinations
+        
+        if( Array.isArray( mapping.outputControl.destinations) ) {
+          destinations = []
+          for( var i = 0; i < mapping.outputControl.destinations.length; i++ ) {
+            destinations[ i ] = this.destinations[ mapping.outputControl.destinations[ i ] ]
+          }
+        }else{
+          destinations = mapping.outputControl.destinations !== -1 ? [ this.destinations[ mapping.outputControl.destinations ] ] : this.destinations
+        }
+        
+        for( var i = 0; i < destinations.length; i++ ) {
+          ( function() {
+            var destination = destinations[ i ]
+        
+            if( _.isObject( destination ) ) {
+              mapping.outputControl.on( 'value', function( _value ) {
+                destination.output( '/' + mapping.input.name , 'f', [ _value ] )
+              })
+            }else{
+              throw 'A null destination was encountered';
+            }
+          })()
         }
       },
     })

@@ -4,16 +4,24 @@
 </head>
 <body></body>
 <script>
+  
   var socketString = 'ws://127.0.0.1:9081',
       socket = new WebSocket( socketString )
+      
+  body = document.querySelector('body')
   
   socket.onmessage = function (event) {
-    var data = JSON.parse( event.data )
-    alert( "RESPONSE: " + data.value )
+    var data = JSON.parse( event.data ),
+        p = document.createElement( 'p' )
+        
+    p.innerHTML = data.key + " : " + data.values.toString()
+    body.appendChild( p )
   }
   
   socket.onopen = function() { 
-    socket.send( JSON.stringify({ path:'/interface/applications/test/inputs/blah/max', params:[] }) ) 
+    // all output messages should take the form { path:'', params:[] }
+    socket.send( JSON.stringify({ key:'/interface/applications/test/inputs/blah/max', values:[] }) ) 
   }
+  
 </script>
 </html>
