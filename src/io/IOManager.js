@@ -52,7 +52,7 @@ IM = module.exports = {
       
       IM.loaded.push( ioName )
       
-      io.test()
+      //io.test()
     }
   },
   

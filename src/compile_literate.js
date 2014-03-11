@@ -11,7 +11,8 @@ files = [
   'transports/WebSocket',  
   'transports/ZeroMQ',  
   'ApplicationManager',
-  'Switchboard',  
+  'Switchboard',
+  'Types',  
   'main',
 ]
 

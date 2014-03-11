@@ -1,7 +1,7 @@
 main.js
 =======
 
-    var _ = require( 'lodash' ), EE = require('events').EventEmitter, testApp,
+    var _ = require( 'lodash' ), EE = require('events').EventEmitter, testApp, Types,
 
     IS2 = {
       ioManager: null,
@@ -15,6 +15,7 @@ main.js
         this.transportManager   = require( './transports/TransportManager.js' ).init( this )        
         this.applicationManager = require( './ApplicationManager.js' ).init( this )
         this.switchboard        = require( './Switchboard.js' ).init( this )
+        Types = this.types      = require( './Types.js' ).init( this )
         
         setTimeout( function() {
           this.applicationManager.createApplicationWithText( testApp )
@@ -39,12 +40,15 @@ main.js
       "    blah3: { min: 2, max: 10, destinations: 2 },",      
       "  },",
       "  mappings: [",
-      "    { input: { io:'USB 2-Axis 8-Button Gamepad', name:'Button1' }, transform:false, output:{ io:'test', name:'blah'  }, expression: function( v ) { return v * .33 } },",
-      "    { input: { io:'USB 2-Axis 8-Button Gamepad', name:'Button2' }, expression: function(v) { blah = v } },",
-      "    { input: { io:'USB 2-Axis 8-Button Gamepad', name:'Button3' }, output:{ io:'test', name:'blah3' }, expression: function(v) { return v * blah } },",      
+      //"    { input: { io:'USB 2-Axis 8-Button Gamepad', name:'Button1' }, transform:false, output:{ io:'test', name:'blah'  }, expression: function( v ) { return v * .33 } },",
+      //"    { input: { io:'USB 2-Axis 8-Button Gamepad', name:'Button2' }, expression: function(v) { blah = v } },",
+      //"    { input: { io:'USB 2-Axis 8-Button Gamepad', name:'Button3' }, output:{ io:'test', name:'blah3' }, expression: function(v) { return v * blah } },",      
       "  ]",
       "}"
     ].join('\n')
     
     IS2.init()
     global.IS2 = IS2
+    
+    //var q = [ .65,-.27,.65,.27 ]
+    //console.log( "CONVERT", Types.convert( 'Quaternion', 'Euler', q ) )

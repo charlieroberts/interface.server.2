@@ -77,7 +77,7 @@ The *load* method attempts to find a given IO module and require it. If the modu
           
           IM.loaded.push( ioName )
           
-          io.test()
+          //io.test()
         }
       },
 
