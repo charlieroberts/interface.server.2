@@ -3,10 +3,11 @@ IOManager
 The IOManager handles loading, verification, enumeration and disposal of IO objects.
 
 **lo-dash** is our utility library of choice
-
+    !function() {
+      
     var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter,
 		
-    IM = module.exports = {
+    IM = {
       app: null,
 
 *defaults* is an array of module names that are loaded by default.
@@ -24,9 +25,7 @@ TODO: there should be some type of user preferences that decide which modules ar
 
       init: function( app ) {
         this.__proto__ = new EE()
-  
-        this.app = app
-  
+    
         _.forEach( this.defaults, this.load )
   
         this.on( 'new device', function( device ) {
@@ -103,3 +102,8 @@ defaults can be overridden by passing a dictionary to the IO constructor.
       getInputNames:  function() { return _.keys( this.inputs ) },
       getOutputNames: function() { return _.keys( this.outputs ) },
     })
+    
+    
+    module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } IM.app = IS; return IM; }
+    
+    }()

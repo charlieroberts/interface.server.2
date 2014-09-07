@@ -12,7 +12,7 @@ _HID = module.exports = {
     
     this.devices = HID.devices()
     
-    //console.log( this.getDeviceNames() )
+    console.log( this.getDeviceNames() )
   },
   
   test: function() {

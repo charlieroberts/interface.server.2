@@ -5,10 +5,11 @@ as they see fit. Messages sent from IS2 to clients come in the form { path:'/som
 You can test basic WebSocket functionality by running IS2 and then opening the webSocketTest.htm file found in the *tests* directory.
 
 _ is our lo-dash reference; this object also relies on the node ws module: https://www.npmjs.org/package/ws.
-
-    var _ = require( 'lodash' ), EE,
+    !function() {
+      
+    var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter,
 		
-    WS = module.exports = {
+    WS = {
       app: null,
       port: 9080, // TODO: this should be read in from defaults
       clients: {},
@@ -16,10 +17,7 @@ _ is our lo-dash reference; this object also relies on the node ws module: https
       server: null,
       servers:{},
       
-      init: function( app ) {
-        this.app = app      
-        
-        EE = require( 'events' ).EventEmitter
+      init: function() {     
         this.__proto__ = new EE()
         
         this.server = this.createServer( 9080 )
@@ -91,3 +89,7 @@ existing OSC sockets are closed.
         }
       },
     }
+    
+    module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } WS.app = IS; return WS; }
+    
+    }()

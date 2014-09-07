@@ -18,7 +18,7 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
         
         this.devices = HID.devices()
         
-        //console.log( this.getDeviceNames() )
+        console.log( this.getDeviceNames() )
       },
       
       test: function() {

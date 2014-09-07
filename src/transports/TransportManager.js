@@ -1,6 +1,8 @@
-var _ = require( 'lodash' )
-TM = module.exports = {
-  app: null,
+!function() {
+var _ = require( 'lodash' ),
+    IS,
+TM = {
+  app: IS,
   defaults: [ 'OSC', 'WebSocket', 'ZeroMQ' ],
   transports: {},
   verify: function( transport, transportName ) {
@@ -28,7 +30,7 @@ TM = module.exports = {
     //console.log( TM.app.root + 'transports/' + transportName + '.js ')
     
     try {
-      transport = require( TM.app.root + 'transports/' + transportName + '.js' )
+      transport = require( TM.app.root + 'transports/' + transportName + '.js' )( IS )
     }catch( e ) {
       throw 'Transport ' + transportName + ' not found.'
       return
@@ -42,9 +44,7 @@ TM = module.exports = {
     }
   },
   
-  init: function( app ) {
-    this.app = app
-    
+  init: function() {
     _.forEach( this.defaults, this.load )
     
     return this
@@ -71,3 +71,7 @@ TM = module.exports = {
     return destination
   },
 }
+
+module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } TM.app = IS; return TM; }
+
+}()

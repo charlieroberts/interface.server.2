@@ -1,5 +1,10 @@
-var _ = require( 'lodash' ), EE,
-ZMQ = module.exports = {
+!function( IS ) {
+  
+var _ = require( 'lodash' ), 
+    EE = require( 'events' ).EventEmitter,
+    zmq = require( 'zmq' ),
+    server = zmq.socket('push'),
+ZMQ = {
   app: null,
   port: 10080, // TODO: this should be read in from defaults
   ip: 'tcp://127.0.0.1',
@@ -9,10 +14,6 @@ ZMQ = module.exports = {
   servers:{},
   
   init: function( app ) {
-    console.log( '0MQ' )
-    this.app = app      
-    
-    EE = require( 'events' ).EventEmitter
     this.__proto__ = new EE()
             
     this.on( 'ZeroMQ server created', function( server, port ) {
@@ -21,9 +22,6 @@ ZMQ = module.exports = {
   },
   createServer : function( ip, port ) {
     if( this.servers[ port ] ) return this.servers[ port ]
-    
-    var zmq = require( 'zmq' ),
-        server = zmq.socket('push')
         
     server.bindSync( 'tcp://' + ip + ':' + port );
     
@@ -40,3 +38,7 @@ ZMQ = module.exports = {
     return server
   },
 }
+
+module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } ZMQ.app = IS; return ZMQ; }
+
+}()

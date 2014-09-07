@@ -1,5 +1,7 @@
+!function() {
+  
 var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter,
-IM = module.exports = {
+IM = {
   app: null,
   defaults: [ 'hid' ],
   loaded: [],
@@ -8,7 +10,7 @@ IM = module.exports = {
   
   init: function( app ) {
     this.__proto__ = new EE()
-    this.app = app
+
     _.forEach( this.defaults, this.load )
     this.on( 'new device', function( device ) {
       IM.devices[ device.name ] = device
@@ -75,3 +77,8 @@ _.assign( IM.IO.prototype, {
   getInputNames:  function() { return _.keys( this.inputs ) },
   getOutputNames: function() { return _.keys( this.outputs ) },
 })
+
+
+module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } IM.app = IS; return IM; }
+
+}()

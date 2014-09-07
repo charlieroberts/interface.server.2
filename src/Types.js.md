@@ -5,18 +5,21 @@ By default all inputs and outputs are assumed to be single dimension, 64-bit dou
 can be assigned one of the various types here to trigger type conversion when they are mapped to an io with a different type.
 
 _ is our lo-dash reference
-
-    var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter, IS2,
+    !function() {
+      
+    var _ = require( 'lodash' ), 
+        EE = require( 'events' ).EventEmitter,
+        IS,
 		
-    Types = module.exports = {
+    Types = {
       Quaternion: { dimensions:4, type:'number' },
       Euler     : { dimensions:3, type:'number' },
       Float : { dimensions:1, type:'number' },
       String: { dimensions:1, type:'string' },
       Int   : { dimensions:1, type:'number' },
+      Raw   : {},
       
-      init: function( app ) {
-        IS2 = app
+      init: function() {
         this.__proto__ = new EE()
 
         return this;
@@ -66,6 +69,24 @@ _ is our lo-dash reference
       	      z = c1*s2*c3 - s1*c2*s3
               
           return [ x,y,z,w ]
-        }
+        },
+      },
+      String: {
+        Float: function( string ) { return parseFloat( string ) },
+        Int: function( string ) { return parseInt( string ) }
+      },
+      Float: {
+        String: function( float ) { return "" + float },
+        Int: function( float ) { return Math.round( float ) }
+      },
+      Int: {
+        String: function( int ) { return "" + int },
+        Float: function( int ) { return int }
       },
     }
+    
+    module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } Types.app = IS; return Types; }
+
+    }()
+  
+  

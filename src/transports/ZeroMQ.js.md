@@ -5,11 +5,15 @@ as they see fit. Messages sent from IS2 to clients come in as JSON strings in th
 { path:'/some/path/to/somewhere', values:[ 0,1,"stringy" ] }. You can test basic ZeroMQ functionality by running IS2 and then 
 running the zeroMQ_test.js file found in the *tests* directory using node.
 
-_ is our lo-dash reference; this object also relies on the node ws module: https://www.npmjs.org/package/ws.
-
-    var _ = require( 'lodash' ), EE,
+_ is our lo-dash reference; this object also relies on the node zmq module.
+    !function( IS ) {
+      
+    var _ = require( 'lodash' ), 
+        EE = require( 'events' ).EventEmitter,
+        zmq = require( 'zmq' ),
+        server = zmq.socket('push'),
 		
-    ZMQ = module.exports = {
+    ZMQ = {
       app: null,
       port: 10080, // TODO: this should be read in from defaults
       ip: 'tcp://127.0.0.1',
@@ -19,10 +23,6 @@ _ is our lo-dash reference; this object also relies on the node ws module: https
       servers:{},
       
       init: function( app ) {
-        console.log( '0MQ' )
-        this.app = app      
-        
-        EE = require( 'events' ).EventEmitter
         this.__proto__ = new EE()
                 
         this.on( 'ZeroMQ server created', function( server, port ) {
@@ -34,9 +34,6 @@ _ is our lo-dash reference; this object also relies on the node ws module: https
 
       createServer : function( ip, port ) {
         if( this.servers[ port ] ) return this.servers[ port ]
-        
-        var zmq = require( 'zmq' ),
-            server = zmq.socket('push')
             
         server.bindSync( 'tcp://' + ip + ':' + port );
         
@@ -53,3 +50,7 @@ _ is our lo-dash reference; this object also relies on the node ws module: https
         return server
       },
     }
+    
+    module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } ZMQ.app = IS; return ZMQ; }
+    
+    }()

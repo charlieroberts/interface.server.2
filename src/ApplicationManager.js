@@ -1,10 +1,12 @@
-var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter,
+!function() {
+  
+var _ = require( 'lodash' ), 
+    EE = require( 'events' ).EventEmitter,
+    IS,
 AM = module.exports = {
   applications: {},
   
-  init: function( app ) {
-    this.app = app
-    
+  init: function() {
     this.__proto__ = new EE()
     
     this.on( 'new application', 
@@ -17,12 +19,18 @@ AM = module.exports = {
     return this
   },
   createApplicationWithText: function( appString ) {
-    var io, destinations
+    var io, destinations, app
     
     eval( appString )
     app = new AM.Application( app )
     
  
+    this.emit( 'new application', app )
+  },
+  
+  createApplicationWithObject: function( obj ) {
+    var app = new AM.Application( obj )
+
     this.emit( 'new application', app )
   },
   removeApplicationWithName : function( name ) {
@@ -152,3 +160,8 @@ _.assign( AM.Application.prototype, {
 })
 
 AM.Application.prototype.__proto__ = new EE()
+
+
+module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } AM.app = IS; return AM; }
+
+}()

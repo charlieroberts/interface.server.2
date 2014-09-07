@@ -1,5 +1,7 @@
-var _ = require( 'lodash' ), EE,
-WS = module.exports = {
+!function() {
+  
+var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter,
+WS = {
   app: null,
   port: 9080, // TODO: this should be read in from defaults
   clients: {},
@@ -7,10 +9,7 @@ WS = module.exports = {
   server: null,
   servers:{},
   
-  init: function( app ) {
-    this.app = app      
-    
-    EE = require( 'events' ).EventEmitter
+  init: function() {     
     this.__proto__ = new EE()
     
     this.server = this.createServer( 9080 )
@@ -76,3 +75,7 @@ WS = module.exports = {
     }
   },
 }
+
+module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } WS.app = IS; return WS; }
+
+}()

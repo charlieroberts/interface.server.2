@@ -5,10 +5,12 @@ as OSC, MIDI and WebSockets.
 
 **lo-dash** is our utility library of choice
 
-    var _ = require( 'lodash' )
+    !function() {
+    var _ = require( 'lodash' ),
+        IS,
 		
-    TM = module.exports = {
-      app: null,
+    TM = {
+      app: IS,
 
 *defaults* is an array of transports that are loaded by default.
 
@@ -48,7 +50,7 @@ The *load* method attempts to find a given IO module and require it. If the modu
         //console.log( TM.app.root + 'transports/' + transportName + '.js ')
         
         try {
-          transport = require( TM.app.root + 'transports/' + transportName + '.js' )
+          transport = require( TM.app.root + 'transports/' + transportName + '.js' )( IS )
         }catch( e ) {
           throw 'Transport ' + transportName + ' not found.'
           return
@@ -64,9 +66,7 @@ The *load* method attempts to find a given IO module and require it. If the modu
       
 The *init* function loads every io stored named in the *defaults* array. TODO: there should be some type of user preferences that decide which modules are loaded.
 
-      init: function( app ) {
-        this.app = app
-        
+      init: function() {
         _.forEach( this.defaults, this.load )
         
         return this
@@ -98,3 +98,7 @@ WebSocket / OSC / MIDI etc. connection.
         return destination
       },
     }
+    
+    module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } TM.app = IS; return TM; }
+    
+    }()

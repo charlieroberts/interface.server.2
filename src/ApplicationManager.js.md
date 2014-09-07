@@ -4,9 +4,11 @@ The *ApplicationManager* object handles the creation of *applications*, which ar
 *mappings* between input and output *IO* objects along with destinations defining where the application receives
 input messages. 
 
-_ is our lo-dash reference, while HID refers to the node HID module, https://www.npmjs.org/package/node-hid.
-
-    var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter,
+    !function() {
+      
+    var _ = require( 'lodash' ), 
+        EE = require( 'events' ).EventEmitter,
+        IS,
 		
     AM = module.exports = {
 
@@ -14,9 +16,7 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
 
       applications: {},
       
-      init: function( app ) {
-        this.app = app
-        
+      init: function() {
         this.__proto__ = new EE()
         
         this.on( 'new application', 
@@ -31,10 +31,10 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
       },
 
 *createApp* is used to generate an application (a set of inputs that with mappings and associated destinations) from a provided
-JavaScript string.
+JavaScript string. Useful when app data is transmitted over a network
   
       createApplicationWithText: function( appString ) {
-        var io, destinations
+        var io, destinations, app
         
         eval( appString )
 
@@ -42,6 +42,14 @@ JavaScript string.
         
 Emit an event telling the ApplicationManager listeners that a new application has been created.
      
+        this.emit( 'new application', app )
+      },
+      
+*createAppplicationWithObj* is used to generate an application (a set of inputs that with mappings and associated destinations) from a provided
+JavaScript object.
+      createApplicationWithObject: function( obj ) {
+        var app = new AM.Application( obj )
+    
         this.emit( 'new application', app )
       },
 
@@ -187,3 +195,7 @@ value can be a single array index, an array of indices, or -1 to indicate use of
     
     AM.Application.prototype.__proto__ = new EE()
     
+    
+    module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } AM.app = IS; return AM; }
+    
+    }()

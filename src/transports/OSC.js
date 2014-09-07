@@ -1,15 +1,17 @@
-var _ = require( 'lodash' ), omgosc, EE, oscInputCount = 0,
-OSC = module.exports = {
-  app: null,
+!function() {
+  
+var _ = require( 'lodash' ), 
+        omgosc = require( 'omgosc' ),
+        EE,
+        oscInputCount = 0,
+        IS,
+OSC = {
+  app: IS,
   
   receivers: {},
   
-  init: function( app ) {
-    this.app = app      
+  init: function() {
     this.__proto__ = new (require( 'events' ).EventEmitter)()
-    
-    omgosc = require( 'omgosc' )
-    
     // remote handles input OSC messages for remote control
     this.remote = this.receiver( 8081, 'remote' )
   },
@@ -54,3 +56,7 @@ OSC = module.exports = {
     }
   },
 }
+
+module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } OSC.app = IS; return OSC; }
+
+}()
