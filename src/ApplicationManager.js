@@ -7,7 +7,7 @@ AM = module.exports = {
   applications: {},
   
   init: function() {
-    this.__proto__ = new EE()
+        this.__proto__ = new EE()
     
     this.on( 'new application', 
       function( application ) {

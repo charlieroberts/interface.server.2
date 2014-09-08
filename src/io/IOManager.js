@@ -1,6 +1,6 @@
 !function() {
   
-var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter,
+var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter, IS,
 IM = {
   app: null,
   defaults: [ 'hid' ],
@@ -8,8 +8,9 @@ IM = {
   
   devices: {},
   
-  init: function( app ) {
-    this.__proto__ = new EE()
+  init: function() {
+    console.log(" INIT CALLED ON IOMANAGER ", this )
+        this.__proto__ = new EE()
 
     _.forEach( this.defaults, this.load )
     this.on( 'new device', function( device ) {
@@ -66,7 +67,7 @@ IM = {
     
     _.assign( this, props )
     
-    this.__proto__ = new EE()
+        this.__proto__ = new EE()
     
     IM.emit( 'new device', this )
     IM.loaded.push( this.name )
@@ -77,7 +78,6 @@ _.assign( IM.IO.prototype, {
   getInputNames:  function() { return _.keys( this.inputs ) },
   getOutputNames: function() { return _.keys( this.outputs ) },
 })
-
 
 module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } IM.app = IS; return IM; }
 

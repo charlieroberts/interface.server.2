@@ -12,7 +12,7 @@ _ is our lo-dash reference, while HID refers to the node HID module, https://www
       init: function( app ) {
         this.app = app
 
-        this.__proto__ = new EE()
+            this.__proto__ = new EE()
                 
         HID = require( 'node-hid' )
         

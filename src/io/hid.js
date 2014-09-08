@@ -1,18 +1,26 @@
-var _ = require( 'lodash' ), HID, EE = require('events').EventEmitter, util = require( 'util' )
+var _ = require( 'lodash' ), HID = require( 'node-hid' ), EE = require('events').EventEmitter, util = require( 'util' )
 _HID = module.exports = {
   app: null,
   devices: null,
   loaded: [],
   getDeviceNames: function() { return _.pluck( this.devices, 'product' ) },
   init: function( app ) {
-    this.app = app
     this.__proto__ = new EE()
-            
-    HID = require( 'node-hid' )
+    
+    console.log( this )
+    
+    this.app = app
     
     this.devices = HID.devices()
+        
+    var names = this.getDeviceNames()
+    var idx = _.findIndex( this.devices, { product:'Logitech RumblePad 2 USB'} ),
+        device = new HID.HID( this.devices[ idx ].path )
     
-    console.log( this.getDeviceNames() )
+    this.emit( 'new device', device.name, device )
+    this.loaded.push( device )
+    device.btnState = []
+    device.on( 'data', this.read.bind( device ) )
   },
   
   test: function() {
@@ -34,7 +42,8 @@ _HID = module.exports = {
     var xaxis = data[ 0 ],
         yaxis = data[ 1 ],
         btns = data[ 2 ]
-        
+    
+    console.log( data )
     if( xaxis !== this.xaxis ) {
       this.emit( 'X', xaxis, this.xaxis )
       this.xaxis = xaxis
@@ -43,12 +52,16 @@ _HID = module.exports = {
       this.yaxis = yaxis
     }else{
       var store = 1,
-          btnState = [],
+          btnState = [],npm 
           mask = 1
       
       for( var i = 0; i < 8; i++ ) {
-        var state = btnState[ i ] = (btns & mask) / mask,
-            prev  = this.btnState[ i ]
+        var state = btnState[ i ] = (btns & mask) / mask, prev
+        
+        
+        if( isNaN( this.btnState[i] ) ) this.btnState[i] = 0
+        
+        prev  = this.btnState[ i ]
         
         if( state !== prev ) {
           this.emit( 'Button' + i, state, prev )

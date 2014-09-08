@@ -5,7 +5,7 @@ The IOManager handles loading, verification, enumeration and disposal of IO obje
 **lo-dash** is our utility library of choice
     !function() {
       
-    var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter,
+    var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter, IS,
 		
     IM = {
       app: null,
@@ -23,8 +23,9 @@ The *loaded* array stores the names all IO objects that have been loaded by the 
 The *init* function loads every io stored named in the *defaults* array. 
 TODO: there should be some type of user preferences that decide which modules are loaded.
 
-      init: function( app ) {
-        this.__proto__ = new EE()
+      init: function() {
+        console.log(" INIT CALLED ON IOMANAGER ", this )
+            this.__proto__ = new EE()
     
         _.forEach( this.defaults, this.load )
   
@@ -91,7 +92,7 @@ defaults can be overridden by passing a dictionary to the IO constructor.
         
         _.assign( this, props )
         
-        this.__proto__ = new EE()
+            this.__proto__ = new EE()
         
         IM.emit( 'new device', this )
         IM.loaded.push( this.name )
@@ -102,7 +103,6 @@ defaults can be overridden by passing a dictionary to the IO constructor.
       getInputNames:  function() { return _.keys( this.inputs ) },
       getOutputNames: function() { return _.keys( this.outputs ) },
     })
-    
     
     module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } IM.app = IS; return IM; }
     

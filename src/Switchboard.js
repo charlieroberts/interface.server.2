@@ -13,7 +13,7 @@ SB = {
       }
     })
     
-    this.__proto__ = new EE()
+        this.__proto__ = new EE()
     
     return this;
   },

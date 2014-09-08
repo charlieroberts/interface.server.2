@@ -18,7 +18,7 @@ _ is our lo-dash reference; this object also relies on the node ws module: https
       servers:{},
       
       init: function() {     
-        this.__proto__ = new EE()
+            this.__proto__ = new EE()
         
         this.server = this.createServer( 9080 )
         

@@ -20,7 +20,7 @@ _ is our lo-dash reference
       Raw   : {},
       
       init: function() {
-        this.__proto__ = new EE()
+            this.__proto__ = new EE()
 
         return this;
       },
@@ -88,5 +88,3 @@ _ is our lo-dash reference
     module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } Types.app = IS; return Types; }
 
     }()
-  
-  

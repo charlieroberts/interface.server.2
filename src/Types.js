@@ -12,7 +12,7 @@ Types = {
   Raw   : {},
   
   init: function() {
-    this.__proto__ = new EE()
+        this.__proto__ = new EE()
     return this;
   },
   convert: function( type, newType, value ) {
