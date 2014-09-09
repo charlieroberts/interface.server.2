@@ -10,9 +10,8 @@ AM = module.exports = {
   init: function() {
     this.__proto__ = new EE()
     
-    this.on( 'new application', 
-      function( application ) {
-        if( ! _.has( AM.applications, application.name  ) ) {
+    this.on( 'new application', function( application ) {
+        if( ! _.has( AM.applications, application.name ) ) {
           AM.applications[ application.name ] = application
         }
       }
@@ -22,13 +21,42 @@ AM = module.exports = {
   
   loadApplicationWithName: function( appName ) {
     var path = IS.config.pathToApplications + '/' + appName + '.js',
-        app  = require( path )
+        app  = require( path ),
+        hasMappings = 'mappings' in app
     
     this.createApplicationWithObject( app )
     
+    if( !hasMappings ) {
+      if( app.defaultImplementation ) {
+        this.loadImplementationForAppWithName( appName, app.defaultImplementation )
+      }
+    }
+  },
+  
+  loadImplementationForAppWithName: function( appName, implementationName ) {
+    var app = AM.applications[ appName ]
+        mappingsDir = IS.config.pathToApplications + '/' + appName,
+        dirExists = fs.existsSync( mappingsDir )
+        
+    if( dirExists ) {
+      var mappingsPath = mappingsDir + '/' + implementationName,
+          mappingsExists = fs.existsSync( mappingsPath )
+      
+      if( mappingsExists ) {
+        var mappings = require( mappingsPath )
+        
+        this.assignMappingsToApplication( app.name, mappings )
+      }
+    } 
+  },
+  
+  assignMappingsToApplication: function( appName, mappings ) {
+    var app = AM.applications[ appName ]
+    
+    app.mappings = _.map( mappings, app.createMapping, app )
   },
   createApplicationWithText: function( appString ) {
-    var io, destinations, app
+    var io, receivers, app
     
     eval( appString )
     app = new AM.Application( app )
@@ -54,8 +82,9 @@ AM = module.exports = {
     
     this.io = new AM.app.ioManager.IO({ inputs:this.inputs, outputs:this.outputs, name: this.name })
     
-    this.destinations = _.map( this.destinations, this.createDestination, this )
-    this.mappings = _.map( this.mappings, this.createMapping, this )
+    this.receivers = _.map( this.receivers, this.createDestination, this )
+    
+    if( this.mappings ) this.mappings = _.map( this.mappings, this.createMapping, this )
   },
 }
 
@@ -70,8 +99,8 @@ _.assign( AM.Application.prototype, {
     return destination
   },
   
-  createMapping: function( mapping, key ) {
-    var inputIO, outputIO, _in, _out, transform, outputFunction, app = this, destinations
+  createMapping: function( mapping ) {
+    var inputIO, outputIO, _in, _out, transform, outputFunction, app = this, receivers
     
     inputIO  = AM.app.ioManager.devices[ mapping.input.io ]
     
@@ -101,13 +130,12 @@ _.assign( AM.Application.prototype, {
     }else{
       return 
     }
-    
-    console.log( "MAPPING", mapping.input.name )
+        
     inputIO.on( mapping.input.name, outputFunction )
     
     mapping.inputControl = _in
     
-    if( mapping.output ) this.linkMappingOutputToDestinations( mapping, destinations )
+    if( mapping.output ) this.linkMappingOutputToDestinations( mapping, receivers )
     app.on( 'close', function() { inputIO.removeListener( mapping.input.name, outputFunction ) })  
     
     return mapping
@@ -142,21 +170,19 @@ _.assign( AM.Application.prototype, {
   },
   
   linkMappingOutputToDestinations: function( mapping ) {
-    var destinations
-    
-    if( Array.isArray( mapping.outputControl.destinations) ) {
-      destinations = []
-      for( var i = 0; i < mapping.outputControl.destinations.length; i++ ) {
-        destinations[ i ] = this.destinations[ mapping.outputControl.destinations[ i ] ]
+    var receivers
+    if( Array.isArray( mapping.outputControl.receivers ) ) {
+      receivers = []
+      for( var i = 0; i < mapping.outputControl.receivers.length; i++ ) {
+        receivers[ i ] = this.receivers[ mapping.outputControl.receivers[ i ] ]
       }
     }else{
-      destinations = mapping.outputControl.destinations !== -1 ? [ this.destinations[ mapping.outputControl.destinations ] ] : this.destinations
+      receivers = this.receivers.indexOf( mapping.outputControl.receivers ) > -1 ? [ this.receivers[ mapping.outputControl.receivers ] ] : this.receivers
     }
-    
-    for( var i = 0; i < destinations.length; i++ ) {
+
+    for( var i = 0; i < receivers.length; i++ ) {
       ( function() {
-        var destination = destinations[ i ]
-    
+        var destination = receivers[ i ]
         if( _.isObject( destination ) ) {
           mapping.outputControl.on( 'value', function( _value ) {
             destination.output( '/' + mapping.input.name , 'f', [ _value ] )

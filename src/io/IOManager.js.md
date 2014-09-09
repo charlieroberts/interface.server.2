@@ -24,7 +24,7 @@ The *init* function loads every io stored named in the *defaults* array.
 TODO: there should be some type of user preferences that decide which modules are loaded.
 
       init: function() {
-        console.log(" INIT CALLED ON IOMANAGER" )
+        //console.log( "INIT CALLED ON IOMANAGER" )
         
         this.__proto__ = new EE()
     
@@ -32,7 +32,7 @@ TODO: there should be some type of user preferences that decide which modules ar
   
         this.on( 'new device', function( device ) {
           IM.devices[ device.name ] = device
-          console.log( "NEW DEVICE", device.name )
+          console.log( 'NEW DEVICE', device.name )
         })
   
         return this

@@ -9,14 +9,14 @@ IM = {
   devices: {},
   
   init: function() {
-    console.log(" INIT CALLED ON IOMANAGER" )
+    //console.log( "INIT CALLED ON IOMANAGER" )
     
     this.__proto__ = new EE()
 
     _.forEach( this.defaults, this.load )
     this.on( 'new device', function( device ) {
       IM.devices[ device.name ] = device
-      console.log( "NEW DEVICE", device.name )
+      console.log( 'NEW DEVICE', device.name )
     })
     return this
   },      

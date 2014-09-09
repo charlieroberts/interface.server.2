@@ -1,7 +1,7 @@
 ApplicationManager
 ==================
 The *ApplicationManager* object handles the creation of *applications*, which are essentially collections of
-*mappings* between input and output *IO* objects along with destinations defining where the application receives
+*mappings* between input and output *IO* objects along with receivers defining where the application receives
 input messages. 
 
     !function() {
@@ -20,9 +20,8 @@ input messages.
       init: function() {
         this.__proto__ = new EE()
         
-        this.on( 'new application', 
-          function( application ) {
-            if( ! _.has( AM.applications, application.name  ) ) {
+        this.on( 'new application', function( application ) {
+            if( ! _.has( AM.applications, application.name ) ) {
               AM.applications[ application.name ] = application
             }
           }
@@ -33,17 +32,46 @@ input messages.
       
       loadApplicationWithName: function( appName ) {
         var path = IS.config.pathToApplications + '/' + appName + '.js',
-            app  = require( path )
+            app  = require( path ),
+            hasMappings = 'mappings' in app
         
         this.createApplicationWithObject( app )
         
+        if( !hasMappings ) {
+          if( app.defaultImplementation ) {
+            this.loadImplementationForAppWithName( appName, app.defaultImplementation )
+          }
+        }
+      },
+      
+      loadImplementationForAppWithName: function( appName, implementationName ) {
+        var app = AM.applications[ appName ]
+            mappingsDir = IS.config.pathToApplications + '/' + appName,
+            dirExists = fs.existsSync( mappingsDir )
+            
+        if( dirExists ) {
+          var mappingsPath = mappingsDir + '/' + implementationName,
+              mappingsExists = fs.existsSync( mappingsPath )
+          
+          if( mappingsExists ) {
+            var mappings = require( mappingsPath )
+            
+            this.assignMappingsToApplication( app.name, mappings )
+          }
+        } 
+      },
+      
+      assignMappingsToApplication: function( appName, mappings ) {
+        var app = AM.applications[ appName ]
+        
+        app.mappings = _.map( mappings, app.createMapping, app )
       },
 
-*createApp* is used to generate an application (a set of inputs that with mappings and associated destinations) from a provided
+*createApp* is used to generate an application (a set of inputs that with mappings and associated receivers) from a provided
 JavaScript string. Useful when app data is transmitted over a network
   
       createApplicationWithText: function( appString ) {
-        var io, destinations, app
+        var io, receivers, app
         
         eval( appString )
 
@@ -54,7 +82,7 @@ Emit an event telling the ApplicationManager listeners that a new application ha
         this.emit( 'new application', app )
       },
       
-*createAppplicationWithObj* is used to generate an application (a set of inputs that with mappings and associated destinations) from a provided
+*createAppplicationWithObj* is used to generate an application (a set of inputs that with mappings and associated receivers) from a provided
 JavaScript object.
       createApplicationWithObject: function( obj ) {
         var app = new AM.Application( obj )
@@ -74,9 +102,9 @@ JavaScript object.
         
         this.io = new AM.app.ioManager.IO({ inputs:this.inputs, outputs:this.outputs, name: this.name })
         
-        this.destinations = _.map( this.destinations, this.createDestination, this )
-
-        this.mappings = _.map( this.mappings, this.createMapping, this )
+        this.receivers = _.map( this.receivers, this.createDestination, this )
+        
+        if( this.mappings ) this.mappings = _.map( this.mappings, this.createMapping, this )
       },
     }
     
@@ -96,8 +124,8 @@ Find all app inputs that use each destination and bind their emit function to ge
 between the input range and the output range. Add a listener to the input object that sends a message to the output destination 
 whenever the input signal changes.
 
-      createMapping: function( mapping, key ) {
-        var inputIO, outputIO, _in, _out, transform, outputFunction, app = this, destinations
+      createMapping: function( mapping ) {
+        var inputIO, outputIO, _in, _out, transform, outputFunction, app = this, receivers
         
         inputIO  = AM.app.ioManager.devices[ mapping.input.io ]
         
@@ -132,7 +160,7 @@ whenever the input signal changes.
         
         mapping.inputControl = _in
         
-        if( mapping.output ) this.linkMappingOutputToDestinations( mapping, destinations )
+        if( mapping.output ) this.linkMappingOutputToDestinations( mapping, receivers )
 
         app.on( 'close', function() { inputIO.removeListener( mapping.input.name, outputFunction ) })  
         
@@ -157,7 +185,7 @@ transform.
       },
 
 *createOutputFunctionForMapping* call transform function and then applies end-user expressions as needed. Finally, it emits the *value* event,
-which causes the mapping object to forward the resulting value to all its destinations.
+which causes the mapping object to forward the resulting value to all its receivers.
       
       createOutputFunctionForMapping : function( mapping ) {
         return function( inputValue, previousInput ) { // 'this' will be bound to output app input...
@@ -172,24 +200,22 @@ which causes the mapping object to forward the resulting value to all its destin
       },
       
 *linkMappingOutputToDestinations* For every destination in the mappings output, register an event that forwards value messages to it. The destination
-value can be a single array index, an array of indices, or -1 to indicate use of all destinations.
+value can be a single array index, an array of indices, or -1 to indicate use of all receivers.
 
       linkMappingOutputToDestinations: function( mapping ) {
-        var destinations
-        
-        if( Array.isArray( mapping.outputControl.destinations) ) {
-          destinations = []
-          for( var i = 0; i < mapping.outputControl.destinations.length; i++ ) {
-            destinations[ i ] = this.destinations[ mapping.outputControl.destinations[ i ] ]
+        var receivers
+        if( Array.isArray( mapping.outputControl.receivers ) ) {
+          receivers = []
+          for( var i = 0; i < mapping.outputControl.receivers.length; i++ ) {
+            receivers[ i ] = this.receivers[ mapping.outputControl.receivers[ i ] ]
           }
         }else{
-          destinations = mapping.outputControl.destinations !== -1 ? [ this.destinations[ mapping.outputControl.destinations ] ] : this.destinations
+          receivers = this.receivers.indexOf( mapping.outputControl.receivers ) > -1 ? [ this.receivers[ mapping.outputControl.receivers ] ] : this.receivers
         }
-        
-        for( var i = 0; i < destinations.length; i++ ) {
+    
+        for( var i = 0; i < receivers.length; i++ ) {
           ( function() {
-            var destination = destinations[ i ]
-        
+            var destination = receivers[ i ]
             if( _.isObject( destination ) ) {
               mapping.outputControl.on( 'value', function( _value ) {
                 destination.output( '/' + mapping.input.name , 'f', [ _value ] )
