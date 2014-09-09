@@ -13,7 +13,7 @@ main.js
       applicationManager: null,
       root: __dirname + '/',
       init: function() {
-            this.__proto__ = new EE()
+        this.__proto__ = new EE()
 
         this.ioManager          = require( './io/IOManager.js' )( this ).init()
         this.transportManager   = require( './transports/TransportManager.js' )( this ).init()

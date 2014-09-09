@@ -1,4 +1,4 @@
-var _ = require( 'lodash' ), HID = require( 'node-hid' ), EE = require('events').EventEmitter, util = require( 'util' )
+var _ = require( 'lodash' ), HID = require( 'node-hid' ), GamePad = require( 'node-gamepad' ), EE = require('events').EventEmitter, util = require( 'util' )
 _HID = module.exports = {
   app: null,
   devices: null,
@@ -6,21 +6,10 @@ _HID = module.exports = {
   getDeviceNames: function() { return _.pluck( this.devices, 'product' ) },
   init: function( app ) {
     this.__proto__ = new EE()
-    
-    console.log( this )
-    
+
     this.app = app
     
     this.devices = HID.devices()
-        
-    var names = this.getDeviceNames()
-    var idx = _.findIndex( this.devices, { product:'Logitech RumblePad 2 USB'} ),
-        device = new HID.HID( this.devices[ idx ].path )
-    
-    this.emit( 'new device', device.name, device )
-    this.loaded.push( device )
-    device.btnState = []
-    device.on( 'data', this.read.bind( device ) )
   },
   
   test: function() {
@@ -43,7 +32,7 @@ _HID = module.exports = {
         yaxis = data[ 1 ],
         btns = data[ 2 ]
     
-    console.log( data )
+        console.log( data )
     if( xaxis !== this.xaxis ) {
       this.emit( 'X', xaxis, this.xaxis )
       this.xaxis = xaxis

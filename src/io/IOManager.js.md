@@ -12,7 +12,7 @@ The IOManager handles loading, verification, enumeration and disposal of IO obje
 
 *defaults* is an array of module names that are loaded by default.
 
-      defaults: [ 'hid' ],
+      defaults: [ 'interface.server.gamepad' ],
 
 The *loaded* array stores the names all IO objects that have been loaded by the IOManager			
 
@@ -25,7 +25,7 @@ TODO: there should be some type of user preferences that decide which modules ar
 
       init: function() {
         console.log(" INIT CALLED ON IOMANAGER ", this )
-            this.__proto__ = new EE()
+        this.__proto__ = new EE()
     
         _.forEach( this.defaults, this.load )
   
@@ -54,15 +54,20 @@ Upon loading an IO object, the *verify* method is called on the object to ensure
 The *load* method attempts to find a given IO module and require it. If the module is found and verified, the modules *init* method is then called.
 
       load: function( ioName ) {
-        var io
+        var io, path, pathExists
         
         if( _.contains( IM.loaded, ioName ) ) {
           console.log( 'module ' + ioName + ' is already loaded.' )
           return
         }
         
+        path = IM.app.root + 'io/' + ioName + '.js'
+        pathExists = fs.existsSync( path )
+        
+        path = pathExists ? path : ioName
+        
         try {
-          io = require( IM.app.root + 'io/' + ioName + '.js' )
+          io = require( path )
         }catch( e ) {
           console.log( 'module ' + ioName + ' not found.' )
           return
@@ -92,7 +97,7 @@ defaults can be overridden by passing a dictionary to the IO constructor.
         
         _.assign( this, props )
         
-            this.__proto__ = new EE()
+        this.__proto__ = new EE()
         
         IM.emit( 'new device', this )
         IM.loaded.push( this.name )
