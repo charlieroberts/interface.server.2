@@ -25,7 +25,6 @@ main.js
         this.config             = require( __dirname + '/../config.js' )
         
         var args = parseArgs( process.argv.slice(2) )
-        console.log( this.config, args )
         
         _.assign( this.config, args )
         // setTimeout( function() {

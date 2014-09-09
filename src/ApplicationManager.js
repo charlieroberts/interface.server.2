@@ -101,7 +101,8 @@ _.assign( AM.Application.prototype, {
     }else{
       return 
     }
-        
+    
+    console.log( "MAPPING", mapping.input.name )
     inputIO.on( mapping.input.name, outputFunction )
     
     mapping.inputControl = _in

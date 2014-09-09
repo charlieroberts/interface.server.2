@@ -1,4 +1,5 @@
-var gamepad = 'Logitech Dual Action #1'
+// var gamepad = 'Logitech Dual Action #1'
+var gamepad = 'Logitech RumblePad 2 USB #1'
 
 module.exports = {
   name:'test1',
