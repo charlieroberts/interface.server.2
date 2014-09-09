@@ -1,15 +1,18 @@
-var _ = require( 'lodash' ), HID = require( 'node-hid' ), GamePad = require( 'node-gamepad' ), EE = require('events').EventEmitter, util = require( 'util' )
+var _ = require( 'lodash' ), HID, EE = require('events').EventEmitter, util = require( 'util' )
 _HID = module.exports = {
   app: null,
   devices: null,
   loaded: [],
   getDeviceNames: function() { return _.pluck( this.devices, 'product' ) },
   init: function( app ) {
-    this.__proto__ = new EE()
-
     this.app = app
+        this.__proto__ = new EE()
+            
+    HID = require( 'node-hid' )
     
     this.devices = HID.devices()
+    
+    console.log( this.getDeviceNames() )
   },
   
   test: function() {
@@ -31,8 +34,7 @@ _HID = module.exports = {
     var xaxis = data[ 0 ],
         yaxis = data[ 1 ],
         btns = data[ 2 ]
-    
-        console.log( data )
+        
     if( xaxis !== this.xaxis ) {
       this.emit( 'X', xaxis, this.xaxis )
       this.xaxis = xaxis
@@ -41,16 +43,12 @@ _HID = module.exports = {
       this.yaxis = yaxis
     }else{
       var store = 1,
-          btnState = [],npm 
+          btnState = [],
           mask = 1
       
       for( var i = 0; i < 8; i++ ) {
-        var state = btnState[ i ] = (btns & mask) / mask, prev
-        
-        
-        if( isNaN( this.btnState[i] ) ) this.btnState[i] = 0
-        
-        prev  = this.btnState[ i ]
+        var state = btnState[ i ] = (btns & mask) / mask,
+            prev  = this.btnState[ i ]
         
         if( state !== prev ) {
           this.emit( 'Button' + i, state, prev )

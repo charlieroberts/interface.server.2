@@ -1,13 +1,14 @@
 !function() {
   
-var _ = require( 'lodash' ), 
+var _  = require( 'lodash' ), 
     EE = require( 'events' ).EventEmitter,
+    fs = require( 'fs' )
     IS,
 AM = module.exports = {
   applications: {},
   
   init: function() {
-        this.__proto__ = new EE()
+    this.__proto__ = new EE()
     
     this.on( 'new application', 
       function( application ) {
@@ -17,6 +18,14 @@ AM = module.exports = {
       }
     )
     return this
+  },
+  
+  loadApplicationWithName: function( appName ) {
+    var path = IS.config.pathToApplications + '/' + appName + '.js',
+        app  = require( path )
+    
+    this.createApplicationWithObject( app )
+    
   },
   createApplicationWithText: function( appString ) {
     var io, destinations, app

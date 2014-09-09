@@ -5,7 +5,7 @@ The IOManager handles loading, verification, enumeration and disposal of IO obje
 **lo-dash** is our utility library of choice
     !function() {
       
-    var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter, IS,
+    var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter, IS, fs = require( 'fs' )
 		
     IM = {
       app: null,
@@ -24,7 +24,8 @@ The *init* function loads every io stored named in the *defaults* array.
 TODO: there should be some type of user preferences that decide which modules are loaded.
 
       init: function() {
-        console.log(" INIT CALLED ON IOMANAGER ", this )
+        console.log(" INIT CALLED ON IOMANAGER" )
+        
         this.__proto__ = new EE()
     
         _.forEach( this.defaults, this.load )
@@ -43,7 +44,7 @@ Upon loading an IO object, the *verify* method is called on the object to ensure
         var result = false
         
         if( typeof io === 'object' ) {
-          if( ( io.inputs || io.outputs ) && io.init ) {
+          if( /*( io.inputs || io.outputs ) &&*/ io.init ) {
             result = true
           }
         }
@@ -76,10 +77,14 @@ The *load* method attempts to find a given IO module and require it. If the modu
         }
         
         if( IM.verify( io ) ) {
-          io.init( IM.app )
-                    
-          io.on( 'new device', function( deviceName, device ) { IM.devices[ deviceName ] = device } )
           
+          io.on( 'new device', function( deviceName, device ) { 
+            console.log( "NEW ", deviceName )
+            IM.devices[ deviceName ] = device 
+          })
+          
+          io.init( IM.app )  
+
           IM.loaded.push( ioName )
           
           //io.test()

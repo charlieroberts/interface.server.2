@@ -1,8 +1,11 @@
-var testApp = require('./testapp')
+var testApp = require('./testapp.js')
 
-global.IS2 = require('../src/Interface.Server').init()
+global.IS2 = require('../src/Interface.Server')
 
-setTimeout( function() {
-  IS2.applicationManager.createApplicationWithObject( testApp )
+global.IS2.onload = function() {
+  //IS2.applicationManager.createApplicationWithObject( testApp )
+  IS2.applicationManager.loadApplicationWithName( 'test1' )
   //this.switchboard.route( '/interface/applications/test/inputs/blah/min', 0 )
-}.bind(this), 2000 )
+}
+
+global.IS2.init()

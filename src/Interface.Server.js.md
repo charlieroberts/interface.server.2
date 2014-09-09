@@ -3,8 +3,9 @@ main.js
     !function() {
       
     var _ = require( 'lodash' ), 
-        EE = require('events').EventEmitter, 
-        testApp = require('./testapp'), 
+        EE = require( 'events' ).EventEmitter,
+        fs = require( 'fs'),
+        parseArgs = require('minimist'),
         Types, IS2;
 
     IS2 = {
@@ -20,11 +21,19 @@ main.js
         this.applicationManager = require( './ApplicationManager.js' )( this ).init()
         this.switchboard        = require( './Switchboard.js' )( this ).init()
         Types = this.types      = require( './Types.js' )( this ).init()
-      
-        setTimeout( function() {
-          this.applicationManager.createApplicationWithObject( testApp )
-          this.switchboard.route( '/interface/applications/test/inputs/blah/min', 0 )
-        }.bind(this), 1000 )
+        
+        this.config             = require( __dirname + '/../config.js' )
+        
+        var args = parseArgs( process.argv.slice(2) )
+        console.log( this.config, args )
+        
+        _.assign( this.config, args )
+        // setTimeout( function() {
+        //   this.applicationManager.createApplicationWithObject( testApp )
+        //   this.switchboard.route( '/interface/applications/test/inputs/blah/min', 0 )
+        // }.bind(this), 1000 )
+        
+        if( this.onload ) this.onload()
         
         return this
       }

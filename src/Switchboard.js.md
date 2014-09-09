@@ -16,12 +16,13 @@ forwarded to the Switchboard for processing.
       init: function() {
         Object.defineProperties( IS, { // for routing purposes
           applications : {
+            configurable: true,
             get: function() { return IS.applicationManager.applications },
             set: function(v) { IS.applicationManager.applications = v }
           }
         })
         
-            this.__proto__ = new EE()
+        this.__proto__ = new EE()
         
         return this;
       },

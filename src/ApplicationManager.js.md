@@ -6,8 +6,9 @@ input messages.
 
     !function() {
       
-    var _ = require( 'lodash' ), 
+    var _  = require( 'lodash' ), 
         EE = require( 'events' ).EventEmitter,
+        fs = require( 'fs' )
         IS,
 		
     AM = module.exports = {
@@ -17,7 +18,7 @@ input messages.
       applications: {},
       
       init: function() {
-            this.__proto__ = new EE()
+        this.__proto__ = new EE()
         
         this.on( 'new application', 
           function( application ) {
@@ -28,6 +29,14 @@ input messages.
         )
 
         return this
+      },
+      
+      loadApplicationWithName: function( appName ) {
+        var path = IS.config.pathToApplications + '/' + appName + '.js',
+            app  = require( path )
+        
+        this.createApplicationWithObject( app )
+        
       },
 
 *createApp* is used to generate an application (a set of inputs that with mappings and associated destinations) from a provided
