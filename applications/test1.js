@@ -31,6 +31,9 @@ module.exports = {
   
   mappings: [
     // if no output object is found, simply call the expression with the provided input.
+    { input: { io:'keypress', name:'a' }, expression: function(v) { console.log(v, v * 15) } },
+    { input: { io:'keypress', name:'b' }, output:{ io:'test1', name:'blah2' } },
+    
     { input: { io:gamepad, name:'button1' }, expression: function(v) { console.log(v, v * 15) } },
     
     // map to input blah2 on app test1

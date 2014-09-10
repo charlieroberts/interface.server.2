@@ -5,15 +5,19 @@ var fs = require( 'fs' ),
 
 files = [
   'src/Interface.Server',
+  
   'src/io/IOManager',
   'src/io/hid',
+  'src/io/keypress',
+  
   'src/transports/TransportManager',
   'src/transports/OSC',
   'src/transports/WebSocket',  
-  'src/transports/ZeroMQ',  
+  'src/transports/ZeroMQ', 
+   
   'src/ApplicationManager',
   'src/Switchboard',
-  'src/Types',  
+  'src/Types',
   //'src/main',
 ]
 

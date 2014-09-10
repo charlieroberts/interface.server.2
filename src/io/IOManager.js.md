@@ -12,7 +12,7 @@ The IOManager handles loading, verification, enumeration and disposal of IO obje
 
 *defaults* is an array of module names that are loaded by default.
 
-      defaults: [ 'interface.server.gamepad' ],
+      defaults: [ 'interface.server.gamepad', 'keypress' ],
 
 The *loaded* array stores the names all IO objects that have been loaded by the IOManager			
 
@@ -65,11 +65,13 @@ The *load* method attempts to find a given IO module and require it. If the modu
         path = IM.app.root + 'io/' + ioName + '.js'
         pathExists = fs.existsSync( path )
         
+        console.log( path, pathExists )
         path = pathExists ? path : ioName
         
         try {
           io = require( path )
         }catch( e ) {
+          console.log( e )
           console.log( 'module ' + ioName + ' not found.' )
           return
         }finally{
@@ -86,8 +88,6 @@ The *load* method attempts to find a given IO module and require it. If the modu
           io.init( IM.app )  
 
           IM.loaded.push( ioName )
-          
-          //io.test()
         }
       },
 

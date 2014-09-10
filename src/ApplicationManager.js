@@ -31,6 +31,8 @@ AM = module.exports = {
         _app,
         hasMappings = 'mappings' in app
     
+    delete require.cache[ path ] // remove so that handshake can easily reload interface
+    
     app.ip = ip
     
     _app = this.createApplicationWithObject( app )
@@ -125,7 +127,10 @@ _.assign( AM.Application.prototype, {
     
     inputIO  = AM.app.ioManager.devices[ mapping.input.io ]
     
-    if( typeof inputIO === 'undefined' ) { throw 'ERROR: Input IO device ' + mapping.input.io + ' is not found.' }
+    if( typeof inputIO === 'undefined' ) { 
+      console.log( 'ERROR: Input IO device ' + mapping.input.io + ' is not found. Cannot map ' + mapping.input.name + '.' )
+      return
+    }
     
     _in  = inputIO.outputs[ mapping.input.name ]
     
