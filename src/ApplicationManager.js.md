@@ -30,18 +30,29 @@ input messages.
         return this
       },
       
-      loadApplicationWithName: function( appName ) {
+      handshake: function( appName, ip ) {
+        var app = AM.loadApplicationWithName( appName, ip )
+        
+        return app
+      },
+      
+      loadApplicationWithName: function( appName, ip ) {
         var path = IS.config.pathToApplications + '/' + appName + '.js',
             app  = require( path ),
+            _app,
             hasMappings = 'mappings' in app
         
-        this.createApplicationWithObject( app )
+        app.ip = ip
+        
+        _app = this.createApplicationWithObject( app )
         
         if( !hasMappings ) {
           if( app.defaultImplementation ) {
             this.loadImplementationForAppWithName( appName, app.defaultImplementation )
           }
         }
+        
+        return _app
       },
       
       loadImplementationForAppWithName: function( appName, implementationName ) {
@@ -58,7 +69,9 @@ input messages.
             
             this.assignMappingsToApplication( app.name, mappings )
           }
-        } 
+        }
+        
+        return app
       },
       
       assignMappingsToApplication: function( appName, mappings ) {
@@ -80,6 +93,8 @@ JavaScript string. Useful when app data is transmitted over a network
 Emit an event telling the ApplicationManager listeners that a new application has been created.
      
         this.emit( 'new application', app )
+        
+        return app
       },
       
 *createAppplicationWithObj* is used to generate an application (a set of inputs that with mappings and associated receivers) from a provided
@@ -88,6 +103,8 @@ JavaScript object.
         var app = new AM.Application( obj )
     
         this.emit( 'new application', app )
+        
+        return app
       },
 
       removeApplicationWithName : function( name ) {
@@ -113,6 +130,10 @@ JavaScript object.
 Find all app inputs that use each destination and bind their emit function to generate output using the *output* method of the destination. 
             
       createDestination: function( _destination, key ) {
+        if( typeof _destination.ip === 'undefined' ) {
+          // ip is assigned in loadApplicationWithName method of ApplicationManager
+          _destination.ip = this.ip
+        }
         var destination = AM.app.transportManager.createDestination( _destination )
       
         this.on( 'close', destination.close.bind( destination ) )

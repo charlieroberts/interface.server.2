@@ -19,18 +19,29 @@ AM = module.exports = {
     return this
   },
   
-  loadApplicationWithName: function( appName ) {
+  handshake: function( appName, ip ) {
+    var app = AM.loadApplicationWithName( appName, ip )
+    
+    return app
+  },
+  
+  loadApplicationWithName: function( appName, ip ) {
     var path = IS.config.pathToApplications + '/' + appName + '.js',
         app  = require( path ),
+        _app,
         hasMappings = 'mappings' in app
     
-    this.createApplicationWithObject( app )
+    app.ip = ip
+    
+    _app = this.createApplicationWithObject( app )
     
     if( !hasMappings ) {
       if( app.defaultImplementation ) {
         this.loadImplementationForAppWithName( appName, app.defaultImplementation )
       }
     }
+    
+    return _app
   },
   
   loadImplementationForAppWithName: function( appName, implementationName ) {
@@ -47,7 +58,9 @@ AM = module.exports = {
         
         this.assignMappingsToApplication( app.name, mappings )
       }
-    } 
+    }
+    
+    return app
   },
   
   assignMappingsToApplication: function( appName, mappings ) {
@@ -63,12 +76,16 @@ AM = module.exports = {
     
  
     this.emit( 'new application', app )
+    
+    return app
   },
   
   createApplicationWithObject: function( obj ) {
     var app = new AM.Application( obj )
 
     this.emit( 'new application', app )
+    
+    return app
   },
   removeApplicationWithName : function( name ) {
     var app = AM.applications[ name ]
@@ -92,6 +109,10 @@ _.assign( AM.Application.prototype, {
   
         
   createDestination: function( _destination, key ) {
+    if( typeof _destination.ip === 'undefined' ) {
+      // ip is assigned in loadApplicationWithName method of ApplicationManager
+      _destination.ip = this.ip
+    }
     var destination = AM.app.transportManager.createDestination( _destination )
   
     this.on( 'close', destination.close.bind( destination ) )

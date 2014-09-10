@@ -9,7 +9,11 @@ module.exports = {
   
   receivers: [
     { type:'OSC', ip:'127.0.0.1', port:8080 },
-    { type:'OSC', ip:'127.0.0.1', port:18080 },
+    
+    // no ip address means derive ip from handshake message
+    // TODO: should port also be derived if not given? Or should that be an error?
+    { type:'OSC', port:18080 },
+    
     { type:'ZeroMQ', ip:'127.0.0.1', port:10080 },
   ],
   

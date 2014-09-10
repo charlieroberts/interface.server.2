@@ -28,6 +28,8 @@ IS2 = {
     //   this.switchboard.route( '/interface/applications/test/inputs/blah/min', 0 )
     // }.bind(this), 1000 )
     
+    this.handshake = this.applicationManager.handshake
+    
     if( this.onload ) this.onload()
     
     return this

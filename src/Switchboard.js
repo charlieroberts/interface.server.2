@@ -19,8 +19,12 @@ SB = {
     return this;
   },
   
+  requiresAddress: [
+    'handshake'
+  ],
   route : function() {
     var args = Array.prototype.slice.call( arguments, 0 ),
+        address = args.pop(),
         msg  = args[ 0 ],
         msgArgs = args.slice( 1 ),
         components = msg.split( '/' ).slice( 2 ), // first should be empty, second is 'interface'
@@ -28,7 +32,7 @@ SB = {
         i = 1, 
         value = IS[ components[0] ],
         tValue = 'object',
-        found = null, lastObject = null
+        found = null, lastObject = null, instanceVariableName
         
     while( i < components.length && tValue === 'object' ) {
       lastObject = value
@@ -36,6 +40,13 @@ SB = {
       tValue = typeof value
       i++
     }
+    
+    instanceVariableName = components[ i - 1]
+    
+    if( instanceVariableName === 'handshake' ) {
+      msgArgs.push( address )
+    }
+    
     if( typeof value === 'function' ) {
       if( msgArgs.length ) {
         value.apply( lastObject, msgArgs )

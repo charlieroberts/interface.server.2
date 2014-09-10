@@ -30,7 +30,11 @@ will be named with a uuid. Return the newly opened socket for event handling.
         
         this.receivers[ name ] = oscin
         oscin.on('', function( args ) {    // path, typetags, params 
+
+          var address = args.params.info.address
           args.params.unshift( args.path ) // switchboard.route accepts one array argument with path at beginning
+          args.params.push( address )      // push osc address to end of message
+          
           var shouldReply = OSC.app.switchboard.route.apply( OSC.app.switchboard, args.params )
           if( shouldReply ) {
             // TODO: where should the result be sent to???
