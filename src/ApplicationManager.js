@@ -2,9 +2,9 @@
   
 var _  = require( 'lodash' ), 
     EE = require( 'events' ).EventEmitter,
-    fs = require( 'fs' )
+    fs = require( 'fs' ),
     IS,
-AM = module.exports = {
+AM = {
   applications: {},
   
   init: function() {
@@ -16,6 +16,9 @@ AM = module.exports = {
         }
       }
     )
+    
+    if( 'application' in IS.config ) AM.loadApplicationWithName( IS.config.application )
+    if( 'app' in IS.config ) AM.loadApplicationWithName( IS.config.app )
     return this
   },
   
@@ -222,8 +225,13 @@ _.assign( AM.Application.prototype, {
 })
 
 AM.Application.prototype.__proto__ = new EE()
-
-
-module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } AM.app = IS; return AM; }
+module.exports = function( __IS ) { 
+  if( typeof IS === 'undefined' ) { 
+    IS = __IS; 
+  }
+  AM.app = IS; 
+  
+  return AM; 
+}
 
 }()

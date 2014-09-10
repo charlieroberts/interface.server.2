@@ -8,10 +8,10 @@ input messages.
       
     var _  = require( 'lodash' ), 
         EE = require( 'events' ).EventEmitter,
-        fs = require( 'fs' )
+        fs = require( 'fs' ),
         IS,
 		
-    AM = module.exports = {
+    AM = {
 
 *interfaces* is an dictionary of all currently running interfaces in Interface.Server.
 
@@ -26,6 +26,9 @@ input messages.
             }
           }
         )
+        
+        if( 'application' in IS.config ) AM.loadApplicationWithName( IS.config.application )
+        if( 'app' in IS.config ) AM.loadApplicationWithName( IS.config.app )
 
         return this
       },
@@ -255,8 +258,14 @@ value can be a single array index, an array of indices, or -1 to indicate use of
     })
     
     AM.Application.prototype.__proto__ = new EE()
-    
-    
-    module.exports = function( __IS ) { if( typeof IS === 'undefined' ) { IS = __IS; } AM.app = IS; return AM; }
+
+    module.exports = function( __IS ) { 
+      if( typeof IS === 'undefined' ) { 
+        IS = __IS; 
+      }
+      AM.app = IS; 
+      
+      return AM; 
+    }
     
     }()
