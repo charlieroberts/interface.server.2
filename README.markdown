@@ -35,7 +35,7 @@ Make sure you have `node.js` and `npm`. Then, at the top level of the repo, run:
 This will install all necessary dependencies.
 
 ## Running
-To start the app:
+To start the app from the top level of the repo:
 
 `node index`
 

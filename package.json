@@ -1,0 +1,39 @@
+{
+  "name": "interface.server",
+  "version": "0.0.0",
+  "description": "Design interactive interfaces using various devices and OSC/0MQ/WebSockets",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "interface.server.gamepad": "~0.0.0",
+    "keypress": "~0.2.1",
+    "lodash": "~2.4.1",
+    "minimist": "~1.1.0",
+    "node-gamepad": "~0.1.13",
+    "node-hid": "~0.3.1",
+    "omgosc": "~1.0.0",
+    "ws": "~0.4.31",
+    "zmq": "~2.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/charlieroberts/interface.server.2.git"
+  },
+  "keywords": [
+    "OSC",
+    "HID",
+    "0MQ",
+    "interfaces"
+  ],
+  "author": "Charlie Roberts <charlie@charlie-roberts.com> (http://www.charlie-roberts.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/charlieroberts/interface.server.2/issues"
+  }
+}
