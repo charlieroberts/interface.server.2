@@ -47,3 +47,19 @@ There are a couple of different options to set with this command:
 
 ## Notes
 This is very beta. There are a couple of test interface files in the `applications` directory that demonstrate how to create interfaces. The `test2` example shows how you can have a separate *interface* file, which defines inputs, outputs and expected ranges, from various *implementation* files, which contain mappings of devices to particular application inputs.
+
+All aspects of the server can be controlled remotely (currently only via OSC, but 0MQ and WebSocket support will come soon). For example, to remove an application named test:
+
+```javascript
+/interface/applicationManager/removeApplicationWithName test
+```
+
+By default IS uses ports defined in config.js to determine which ports these remote control messages are received on.
+
+To get behavior similar to the old device server, simply send a `handshake` message and pass the name of the application.
+
+```javascript
+/interface/handshake yourApplicationName
+```
+
+Ports and IP addresses for receiving messages are configured in the application files. If a receiver is defined with out an IP address (as is seen in applications/test1.js) the receiver will use the IP address that the `\handshake` message originated from. 

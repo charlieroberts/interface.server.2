@@ -13,7 +13,7 @@ IS2 = {
   init: function() {
     this.__proto__ = new EE()
     
-    this.config             = require( __dirname + '/../config.js' )
+    this.config = require( __dirname + '/../config.js' )
     
     var args = parseArgs( process.argv.slice(2) )
     

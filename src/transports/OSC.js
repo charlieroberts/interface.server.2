@@ -13,12 +13,18 @@ OSC = {
   init: function() {
     this.__proto__ = new (require( 'events' ).EventEmitter)()
     // remote handles input OSC messages for remote control
-    this.remote = this.receiver( 8081, 'remote' )
+    var remotePort = IS.config.remotePortOSC || 8081
+    this.remote = this.receiver( remotePort, 'remote' )
   },
   
   
   receiver: function( port, _name ) {
-    var oscin = new omgosc.UdpReceiver( port || 8081 ),
+    if( typeof port === 'undefined' ) {
+      console.log( "OSC error: no port provided to receiver constructor." )
+      return
+    }
+    
+    var oscin = new omgosc.UdpReceiver( port ),
         name = _name || oscInputCount++
     
     this.receivers[ name ] = oscin

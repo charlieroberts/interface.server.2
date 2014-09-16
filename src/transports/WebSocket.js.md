@@ -7,7 +7,9 @@ You can test basic WebSocket functionality by running IS2 and then opening the w
 _ is our lo-dash reference; this object also relies on the node ws module: https://www.npmjs.org/package/ws.
     !function() {
       
-    var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter,
+    var _ = require( 'lodash' ), 
+        EE = require( 'events' ).EventEmitter,
+        IS
 		
     WS = {
       app: null,
@@ -18,9 +20,9 @@ _ is our lo-dash reference; this object also relies on the node ws module: https
       servers:{},
       
       init: function() {     
-            this.__proto__ = new EE()
+        this.__proto__ = new EE()
         
-        this.server = this.createServer( 9080 )
+        this.server = this.createServer( IS.config.remotePortWebSocket )
         
         this.on( 'WebSocket server created', function( server, port ) {
           WS.servers[ port ] = server 

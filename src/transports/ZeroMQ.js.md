@@ -23,7 +23,7 @@ _ is our lo-dash reference; this object also relies on the node zmq module.
       servers:{},
       
       init: function( app ) {
-            this.__proto__ = new EE()
+        this.__proto__ = new EE()
                 
         this.on( 'ZeroMQ server created', function( server, port ) {
           ZMQ.servers[ port ] = server 

@@ -1,6 +1,8 @@
 !function() {
   
-var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter,
+var _ = require( 'lodash' ), 
+    EE = require( 'events' ).EventEmitter,
+    IS
 WS = {
   app: null,
   port: 9080, // TODO: this should be read in from defaults
@@ -10,9 +12,9 @@ WS = {
   servers:{},
   
   init: function() {     
-        this.__proto__ = new EE()
+    this.__proto__ = new EE()
     
-    this.server = this.createServer( 9080 )
+    this.server = this.createServer( IS.config.remotePortWebSocket )
     
     this.on( 'WebSocket server created', function( server, port ) {
       WS.servers[ port ] = server 
