@@ -80,8 +80,14 @@ AM = {
   createApplicationWithText: function( appString ) {
     var io, receivers, app
     
+    console.log("GOT TEXT", appString )
+    
     eval( appString )
+    
+    console.log( 'AFTER EVAL' )
     app = new AM.Application( app )
+    
+    console.log( 'AFTER MAKING APP' )
     
  
     this.emit( 'new application', app )

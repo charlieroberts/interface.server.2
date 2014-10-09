@@ -8,5 +8,10 @@ module.exports = {
     "remotePortOSC": 12000,
     "remotePort0MQ": 13000,
     "remotePortWebSocket":14000,
-
+    
+    // "modules" : [ 
+    //   // "interface.server.phasespace",
+    //   // "interface.server.gamepad",
+    //   "interface.server.keyboard"
+    // ]
 }

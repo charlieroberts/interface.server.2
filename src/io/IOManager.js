@@ -3,7 +3,7 @@
 var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter, IS, fs = require( 'fs' )
 IM = {
   app: null,
-  defaults: [ 'interface.server.gamepad', 'keypress' ],
+  defaults: [ 'interface.server.gamepad', './keypress' ],
   loaded: [],
   
   devices: {},
@@ -40,11 +40,7 @@ IM = {
       return
     }
     
-    path = IM.app.root + 'io/' + ioName + '.js'
-    pathExists = fs.existsSync( path )
-    
-    console.log( path, pathExists )
-    path = pathExists ? path : ioName
+    path = ioName
     
     try {
       io = require( path )

@@ -94,11 +94,11 @@ JavaScript string. Useful when app data is transmitted over a network
   
       createApplicationWithText: function( appString ) {
         var io, receivers, app
-        
+                
         eval( appString )
-
-        app = new AM.Application( app )
         
+        app = new AM.Application( app )
+
 Emit an event telling the ApplicationManager listeners that a new application has been created.
      
         this.emit( 'new application', app )
