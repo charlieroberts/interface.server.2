@@ -20,7 +20,7 @@ _ is our lo-dash reference
       Raw   : {},
       
       init: function() {
-            this.__proto__ = new EE()
+        this.__proto__ = new EE()
 
         return this;
       },

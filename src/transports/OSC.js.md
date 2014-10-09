@@ -5,7 +5,7 @@ TODO: There is a change omgosc should be replaced with osc-min... requires resea
     !function() {
       
     var _ = require( 'lodash' ), 
-            omgosc = require( 'omgosc' ),
+            omgosc = require( '../external/omgosc' ),
             EE,
             oscInputCount = 0,
             IS,

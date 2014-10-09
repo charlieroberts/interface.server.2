@@ -1,7 +1,7 @@
 !function() {
   
 var _ = require( 'lodash' ), 
-        omgosc = require( 'omgosc' ),
+        omgosc = require( '../external/omgosc' ),
         EE,
         oscInputCount = 0,
         IS,

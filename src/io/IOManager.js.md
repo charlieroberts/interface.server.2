@@ -10,7 +10,7 @@ The IOManager handles loading, verification, enumeration and disposal of IO obje
     IM = {
       app: null,
 
-*defaults* is an array of module names that are loaded by default.
+*defaults* is an array of module names that are loaded by default. TODO: read from config.js instead
 
       defaults: [ 'interface.server.gamepad', 'keypress' ],
 
@@ -73,7 +73,7 @@ The *load* method attempts to find a given IO module and require it. If the modu
         }catch( e ) {
           console.log( e )
           console.log( 'module ' + ioName + ' not found.' )
-          return
+          throw e
         }finally{
           console.log( 'module ' + ioName + ' is loaded.' )
         }

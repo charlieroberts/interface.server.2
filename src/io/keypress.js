@@ -13,7 +13,7 @@ Keys = {
     // make `process.stdin` begin emitting "keypress" events
     keypress( process.stdin );
     
-		var letters = "abcdefghijklmnopqrstuvwxyz"
+		var letters = "abcdefghijklmnopqrstuvwxyz`-=[];',./\\"
 
 		for(var l = 0; l < letters.length; l++) {
 			var lt = letters.charAt(l);
@@ -44,12 +44,12 @@ Keys = {
     }
 
     var group
-
-    if( key.ctrl ) group = 'ctrl'
-    if( key.shift ) group = 'shift'
-    if( typeof group === 'undefined' ) group = 'nomod'
     
     if( key ) {
+      if( key.ctrl ) group = 'ctrl'
+      if( key.shift ) group = 'shift'
+      if( typeof group === 'undefined' ) group = 'nomod'
+      
       var shouldEmit = key.name in Keys.triggers[ group ]
       
       if( shouldEmit ) {

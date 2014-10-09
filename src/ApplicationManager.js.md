@@ -39,6 +39,10 @@ input messages.
         return app
       },
       
+      connectApplication: function( spec, ip ) {
+        
+      },
+      
       loadApplicationWithName: function( appName, ip ) {
         var path = IS.config.pathToApplications + '/' + appName + '.js',
             app  = require( path ),

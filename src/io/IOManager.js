@@ -51,7 +51,7 @@ IM = {
     }catch( e ) {
       console.log( e )
       console.log( 'module ' + ioName + ' not found.' )
-      return
+      throw e
     }finally{
       console.log( 'module ' + ioName + ' is loaded.' )
     }

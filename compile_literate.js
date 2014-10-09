@@ -9,6 +9,7 @@ files = [
   'src/io/IOManager',
   'src/io/hid',
   'src/io/keypress',
+  'src/io/mouse',  
   
   'src/transports/TransportManager',
   'src/transports/OSC',
