@@ -28,7 +28,9 @@ main.js
         this.switchboard        = require( './Switchboard.js' )( this ).init()
         Types = this.types      = require( './Types.js' )( this ).init()
         
+        // shortcuts for connecting / disconnecting these make it /interface/handshake instead of /interface/applicationManager/handshake
         this.handshake = this.applicationManager.handshake
+        this.disconnectApplication = this.applicationManager.removeApplicationWithName
         
         if( this.onload ) this.onload()
         
