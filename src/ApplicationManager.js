@@ -79,16 +79,10 @@ AM = {
   },
   createApplicationWithText: function( appString ) {
     var io, receivers, app
-    
-    console.log("GOT TEXT", appString )
-    
+            
     eval( appString )
     
-    console.log( 'AFTER EVAL' )
     app = new AM.Application( app )
-    
-    console.log( 'AFTER MAKING APP' )
-    
  
     this.emit( 'new application', app )
     
@@ -224,7 +218,11 @@ _.assign( AM.Application.prototype, {
         var destination = receivers[ i ]
         if( _.isObject( destination ) ) {
           mapping.outputControl.on( 'value', function( _value ) {
-            destination.output( '/' + mapping.input.name , 'f', [ _value ] )
+            if( _value instanceof Array){
+              destination.output( '/' + mapping.input.name, Array(_value.length+1).join('f'), _value )
+            }else{
+              destination.output( '/' + mapping.input.name, 'f', [ _value ] )
+            }
           })
         }else{
           throw 'A null destination was encountered';

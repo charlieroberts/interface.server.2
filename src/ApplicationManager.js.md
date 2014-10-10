@@ -251,7 +251,11 @@ value can be a single array index, an array of indices, or -1 to indicate use of
             var destination = receivers[ i ]
             if( _.isObject( destination ) ) {
               mapping.outputControl.on( 'value', function( _value ) {
-                destination.output( '/' + mapping.input.name , 'f', [ _value ] )
+                if( _value instanceof Array){
+                  destination.output( '/' + mapping.input.name, Array(_value.length+1).join('f'), _value )
+                }else{
+                  destination.output( '/' + mapping.input.name, 'f', [ _value ] )
+                }
               })
             }else{
               throw 'A null destination was encountered';
