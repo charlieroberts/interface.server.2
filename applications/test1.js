@@ -47,5 +47,5 @@ module.exports = {
         return v * 1000
       }
     }
-  ]
+  ],
 }
