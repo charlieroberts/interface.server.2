@@ -41,10 +41,10 @@ OSC = {
     
     return oscin
   },
-  sender: function( _port, _ip ) {
+  sender: function( _ip, _port ) {
     var port = _port || 8080,
         ip   = _ip || '127.0.0.1',
-        sender = new omgosc.UdpSender( port, ip )
+        sender = new omgosc.UdpSender( ip, port )
     
     sender.output = function( address, typetags, values ) {
       this.send( address, typetags, values )
