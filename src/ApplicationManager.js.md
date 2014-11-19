@@ -252,9 +252,9 @@ value can be a single array index, an array of indices, or -1 to indicate use of
             if( _.isObject( destination ) ) {
               mapping.outputControl.on( 'value', function( _value ) {
                 if( _value instanceof Array){
-                  destination.output( '/' + mapping.input.name, Array(_value.length+1).join('f'), _value )
+                  destination.output( '/' + mapping.output.name, Array(_value.length+1).join('f'), _value )
                 }else{
-                  destination.output( '/' + mapping.input.name, 'f', [ _value ] )
+                  destination.output( '/' + mapping.output.name, 'f', [ _value ] )
                 }
               })
             }else{
