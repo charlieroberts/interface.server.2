@@ -53,10 +53,10 @@ will be named with a uuid. Return the newly opened socket for event handling.
 *sender* Create an OSC sender on a given port with an optional IP address. If no IP address is provided, localhost
 will be used. Return the newly opened socket for sending messages.
 
-      sender: function( _port, _ip ) {
+      sender: function( _ip, _port ) {
         var port = _port || 8080,
             ip   = _ip || '127.0.0.1',
-            sender = new omgosc.UdpSender( port, ip )
+            sender = new omgosc.UdpSender( ip, port )
         
         sender.output = function( address, typetags, values ) {
           this.send( address, typetags, values )
