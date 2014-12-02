@@ -6,7 +6,8 @@ _HID = module.exports = {
   getDeviceNames: function() { return _.pluck( this.devices, 'product' ) },
   init: function( app ) {
     this.app = app
-        this.__proto__ = new EE()
+    this.__proto__ = new EE()
+    this.__proto__.setMaxListeners( 0 )
             
     HID = require( 'node-hid' )
     

@@ -12,6 +12,7 @@ OSC = {
   
   init: function() {
     this.__proto__ = new (require( 'events' ).EventEmitter)()
+    this.__proto__.setMaxListeners( 0 )
     // remote handles input OSC messages for remote control
     var remotePort = IS.config.remotePortOSC || 8081
     this.remote = this.receiver( remotePort, 'remote' )

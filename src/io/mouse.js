@@ -81,4 +81,6 @@ Mouse = {
   }
 }
 Mouse.__proto__ = new EventEmitter()
+Mouse.__proto__.setMaxListeners( 0 )
+
 module.exports = Mouse

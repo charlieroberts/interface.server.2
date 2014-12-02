@@ -81,5 +81,6 @@ The keypress IO accepts keyboard input from the terminal
     }
 
     Keys.__proto__ = new EventEmitter()
-  
+    Keys.__proto__.setMaxListeners( 0 )
+    
     module.exports = Keys

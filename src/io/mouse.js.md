@@ -94,5 +94,6 @@ The mouse IO accepts mouse input from the terminal
     }
 
     Mouse.__proto__ = new EventEmitter()
-  
+    Mouse.__proto__.setMaxListeners( 0 )
+    
     module.exports = Mouse

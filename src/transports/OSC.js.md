@@ -2,6 +2,7 @@ OSC
 ===
 _ is our lo-dash reference; omgosc refers to the node module, https://github.com/deanm/omgosc.
 TODO: There is a change omgosc should be replaced with osc-min... requires research.
+
     !function() {
       
     var _ = require( 'lodash' ), 
@@ -17,6 +18,7 @@ TODO: There is a change omgosc should be replaced with osc-min... requires resea
       
       init: function() {
         this.__proto__ = new (require( 'events' ).EventEmitter)()
+        this.__proto__.setMaxListeners( 0 )
         // remote handles input OSC messages for remote control
         var remotePort = IS.config.remotePortOSC || 8081
         this.remote = this.receiver( remotePort, 'remote' )

@@ -15,7 +15,8 @@ ZMQ = {
   
   init: function( app ) {
     this.__proto__ = new EE()
-            
+    this.__proto__.setMaxListeners( 0 )
+    
     this.on( 'ZeroMQ server created', function( server, port ) {
       ZMQ.servers[ port ] = server 
     })

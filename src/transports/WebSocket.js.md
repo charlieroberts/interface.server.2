@@ -21,6 +21,7 @@ _ is our lo-dash reference; this object also relies on the node ws module: https
       
       init: function() {     
         this.__proto__ = new EE()
+        this.__proto__.setMaxListeners( 0 )
         
         this.server = this.createServer( IS.config.remotePortWebSocket )
         

@@ -15,6 +15,7 @@ SB = {
     })
     
     this.__proto__ = new EE()
+    this.__proto__.setMaxListeners( 0 )
     
     return this;
   },

@@ -12,6 +12,7 @@ IM = {
     //console.log( "INIT CALLED ON IOMANAGER" )
     
     this.__proto__ = new EE()
+    this.__proto__.setMaxListeners( 0 )
 
     _.forEach( this.defaults, this.load )
     this.on( 'new device', function( device ) {

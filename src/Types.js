@@ -13,6 +13,8 @@ Types = {
   
   init: function() {
     this.__proto__ = new EE()
+    this.__proto__.setMaxListeners( 0 )
+    
     return this;
   },
   convert: function( type, newType, value ) {

@@ -19,6 +19,7 @@ input messages.
       
       init: function() {
         this.__proto__ = new EE()
+        this.__proto__.setMaxListeners( 0 )
         
         this.on( 'new application', function( application ) {
             if( ! _.has( AM.applications, application.name ) ) {

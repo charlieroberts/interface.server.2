@@ -13,6 +13,7 @@ WS = {
   
   init: function() {     
     this.__proto__ = new EE()
+    this.__proto__.setMaxListeners( 0 )
     
     this.server = this.createServer( IS.config.remotePortWebSocket )
     

@@ -70,4 +70,6 @@ Keys = {
   }
 }
 Keys.__proto__ = new EventEmitter()
+Keys.__proto__.setMaxListeners( 0 )
+
 module.exports = Keys

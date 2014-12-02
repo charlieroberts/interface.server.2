@@ -27,6 +27,7 @@ TODO: there should be some type of user preferences that decide which modules ar
         //console.log( "INIT CALLED ON IOMANAGER" )
         
         this.__proto__ = new EE()
+        this.__proto__.setMaxListeners( 0 )
     
         _.forEach( this.defaults, this.load )
   
