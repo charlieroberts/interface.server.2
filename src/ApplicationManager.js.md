@@ -122,7 +122,7 @@ JavaScript object.
         app.emit( 'close' )
       },
       
-      Application: function( properties) {
+      Application: function( properties ) {
         _.assign( this, properties )
         
         this.initialProperties = properties
