@@ -209,7 +209,7 @@ transform.
           var _in = this.inputControl, _out = this.outputControl, 
               inputRange = _in.max - _in.min,
               outputRange = _out.max - _out.min,
-              valueAsPercent = ( value - _in.min ) * inputRange,
+              valueAsPercent = ( value - _in.min ) / inputRange,
               output = outputRange * valueAsPercent
               
           output += _out.min
