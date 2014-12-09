@@ -8,8 +8,8 @@ Interface files define inputs, outputs, receivers, and mappings between inputs a
 module.exports = {
   name:'myapp',
   
-  receivers: [
-    { type:'OSC', ip:'127.0.0.1', port:8080 },
+  transports: [
+    { type:'osc', ip:'127.0.0.1', port:8080 },
   ],
   
   inputs: {
@@ -32,12 +32,24 @@ Make sure you have `node.js` and `npm`. Then, at the top level of the repo, run:
 
 `npm install`
 
-This will install all necessary dependencies.
+This will install all necessary dependencies for the core server. Then you need to select which transport / device modules you want to install. Current transports are:
 
+- osc
+- websocket
+
+Current devices are:
+
+- gamepad
+- keyboard
+- phasespace
+
+To install osc and keypress (the most minimal install):
+
+```npm install interface.server.osc && npm install interface.server.keyboard```
 ## Running
 To start the app from the top level of the repo:
 
-`node index`
+`node index` or `node .`
 
 There are a couple of different options to set with this command:
 
@@ -46,9 +58,9 @@ There are a couple of different options to set with this command:
 `--application` or `--app` The name of application to immediately load on launch. For example `node index --app test1`.
 
 ## Notes
-This is very beta. There are a couple of test interface files in the `applications` directory that demonstrate how to create interfaces. The `test2` example shows how you can have a separate *interface* file, which defines inputs, outputs and expected ranges, from various *implementation* files, which contain mappings of devices to particular application inputs.
+There are a couple of test interface files in the `applications` directory that demonstrate how to create interfaces. The `test2` example shows how you can have a separate *interface* file, which defines inputs, outputs and expected ranges, from various *implementation* files, which contain mappings of devices to particular application inputs.
 
-All aspects of the server can be controlled remotely (currently only via OSC, but 0MQ and WebSocket support will come soon). For example, to remove an application named test:
+All aspects of the server can be controlled remotely (currently only via OSC and WebSockets, but 0MQ support will come soon). For example, to remove an application named test:
 
 ```javascript
 /interface/applicationManager/removeApplicationWithName test
