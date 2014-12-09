@@ -12,16 +12,16 @@ AM = {
     this.__proto__.setMaxListeners( 0 )
     
     this.on( 'new application', function( application ) {
-        if( ! _.has( AM.applications, application.name ) ) {
-          AM.applications[ application.name ] = application
-        }
+      if( ! _.has( AM.applications, application.name ) ) {
+        AM.applications[ application.name ] = application
       }
-    )
+    })
     
     if( 'application' in IS.config ) 
       AM.loadApplicationWithName( IS.config.application )
     else if( 'app' in IS.config )
       AM.loadApplicationWithName( IS.config.app )
+    
     return this
   },
   
@@ -85,9 +85,9 @@ AM = {
             
     eval( appString )
     
-    app = new AM.Application( app )
-    
     if( ip ) app.ip = ip
+    
+    app = new AM.Application( app )
  
     this.emit( 'new application', app )
     
@@ -109,6 +109,11 @@ AM = {
   Application: function( properties ) {
     _.assign( this, properties )
     
+    if( _.has( AM.applications, this.name ) ) {
+      console.log("closing existing app with name", this.name )
+      AM.applications[ this.name ].emit( 'close' )
+    }
+    
     this.initialProperties = properties
     
     this.io = new AM.app.ioManager.IO({ inputs:this.inputs, outputs:this.outputs, name: this.name })
@@ -116,6 +121,18 @@ AM = {
     this.transports = _.map( this.transports, this.createDestination, this )
     
     if( this.mappings ) this.mappings = _.map( this.mappings, this.createMapping, this )
+    
+    this.on( 'close', function() { 
+      for( var i = 0; i < this.mappings.length; i++ ) {
+        var mapping = this.mappings[ i ]
+        //if( mapping.inputControl ) { mapping.inputControl.removeAllListeners() }
+        if( mapping.outputControl ) { mapping.outputControl.removeAllListeners() }            
+      }
+      
+      this.removeAllListeners()
+    }.bind(this) )
+    
+    console.log( this.mappings )
   },
 }
 
@@ -129,7 +146,7 @@ _.assign( AM.Application.prototype, {
     }
     var destination = AM.app.transportManager.createDestination( _destination )
   
-    this.on( 'close', destination.close.bind( destination ) )
+    //this.on( 'close', destination.close.bind( destination ) )
     
     return destination
   },
@@ -174,7 +191,9 @@ _.assign( AM.Application.prototype, {
     mapping.inputControl = _in
     
     if( mapping.output ) this.linkMappingOutputToDestinations( mapping, transports )
-    app.on( 'close', function() { inputIO.removeListener( mapping.input.name, outputFunction ) })  
+    app.on( 'close', function() { 
+      inputIO.removeListener( mapping.input.name, outputFunction ) 
+    })  
     
     return mapping
   },
@@ -216,18 +235,19 @@ _.assign( AM.Application.prototype, {
     }else{
       transports = this.transports.indexOf( mapping.outputControl.transports ) > -1 ? [ this.transports[ mapping.outputControl.transports ] ] : this.transports
     }
-
+    
     for( var i = 0; i < transports.length; i++ ) {
       ( function() {
         var destination = transports[ i ]
         if( _.isObject( destination ) ) {
-          mapping.outputControl.on( 'value', function( _value ) {
+          var func = function( _value ) {
             if( _value instanceof Array){
               destination.output( '/' + mapping.output.name, Array(_value.length+1).join('f'), _value )
             }else{
               destination.output( '/' + mapping.output.name, 'f', [ _value ] )
             }
-          })
+          }
+          mapping.outputControl.on( 'value', func )
         }else{
           throw 'A null destination was encountered';
         }
