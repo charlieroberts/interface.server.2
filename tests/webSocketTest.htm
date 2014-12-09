@@ -1,3 +1,15 @@
+<!-- NOTE THIS TEST ASSUMES YOU HAVE THE interface.server.websocket MODULE INSTALLED.
+
+You also need to specify the same port in line 13 as that found in the webserverport property of
+the config.js for interface.server. Like here:
+
+transports: {
+  websocket: {
+    webServerPort: 9080
+  }
+}
+ -->
+
 <html>
 <head>
   <title>Interface.Server 2 WebSocket Test</title>
@@ -5,11 +17,17 @@
 <body></body>
 <script>
   
-  var socketString = 'ws://127.0.0.1:9081',
+  var socketString = 'ws://127.0.0.1:9080',
       socket = new WebSocket( socketString )
       
   body = document.querySelector('body')
   
+  var app = "app = { name:'test1', transports: [{ type:'websocket', port:9080 }]," +
+      "inputs: { blah2: { min: 0, max: 1 } },"+
+      "outputs :{},"+
+      "mappings: [{ input: { io:'keyboard', name:'b' }, output:{ io:'test1', name:'blah2' } }]"+
+      "}"
+      
   socket.onmessage = function (event) {
     var data = JSON.parse( event.data ),
         p = document.createElement( 'p' )
@@ -20,7 +38,7 @@
   
   socket.onopen = function() { 
     // all output messages should take the form { path:'', params:[] }
-    socket.send( JSON.stringify({ key:'/interface/applications/test/inputs/blah/max', values:[] }) ) 
+    socket.send( JSON.stringify({ key:'/interface/applicationManager/createApplicationWithText', values:[ app ] }) ) 
   }
   
 </script>

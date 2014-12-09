@@ -23,6 +23,11 @@ IM = {
     })
     return this
   },      
+  
+  
+  createDevice: function( description ) {
+    var device = new IM.IO( description )
+  }, 
   verify: function( io ) {
     var result = false
     

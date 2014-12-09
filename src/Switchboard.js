@@ -23,10 +23,8 @@ SB = {
   requiresAddress: [
     'handshake', 'createApplicationWithText'
   ],
-  route : function() {
-    var args = Array.prototype.slice.call( arguments, 0 ),
-        address = args.pop(),
-        msg  = args[ 0 ],
+  route : function( args, address ) {
+    var msg  = args[ 0 ],
         msgArgs = args.slice( 1 ),
         components = msg.split( '/' ).slice( 2 ), // first should be empty, second is 'interface'
         output = null, // return null if this is not a getter call
@@ -35,6 +33,7 @@ SB = {
         tValue = 'object',
         found = null, lastObject = null, instanceVariableName
     
+    // console.log( args, msg, msgArgs, address, components )
     if( !components.length ) return // not a switchboard message
     
     while( i < components.length && tValue === 'object' ) {
@@ -47,7 +46,6 @@ SB = {
     instanceVariableName = components[ i - 1]
     
     if( SB.requiresAddress.indexOf( instanceVariableName ) > -1 ) {
-      console.log( "GOT IP ADDRESS FOR", instanceVariableName )
       msgArgs.push( address )
     }
     

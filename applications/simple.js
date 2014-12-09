@@ -1,8 +1,8 @@
 module.exports = {
-  name:'test1',
+  name:'simple',
 
   transports: [
-    { type:'osc', port:8080 },
+    { type:'osc', port:10080 },
   ],
   
   inputs: {
@@ -12,7 +12,7 @@ module.exports = {
   outputs :{},
 
   mappings: [
-    { input: { io:'keyboard', name:'a' }, expression: function(v) { console.log(v, v * 15) } },
-    { input: { io:'keyboard', name:'b' }, output:{ io:'test1', name:'blah' } }
+    { input: { io:'keyboard', name:'a' }, expression: function(v) { console.log("Key input a", v) } },
+    { input: { io:'keyboard', name:'b' }, output:{ io:'simple', name:'blah' } }
   ],
 }

@@ -8,6 +8,9 @@ module.exports = {
       osc : {
         remoteControlPort: 12000,
       },
+      websocket: {
+        webServerPort: 9080
+      }
     },
     
     IO : {

@@ -31,9 +31,7 @@ AM = {
     return app
   },
   
-  connectApplication: function( spec, ip ) {
-    
-  },
+  connectApplication: function( spec, ip ) {},
   
   loadApplicationWithName: function( appName, ip ) {
     var path = IS.config.pathToApplications + '/' + appName + '.js',
@@ -91,7 +89,6 @@ AM = {
  
     this.emit( 'new application', app )
     
-    console.log("APP IP", app.ip, "IP", ip )
     return app
   },
   
@@ -104,15 +101,21 @@ AM = {
   },
   removeApplicationWithName : function( name ) {
     var app = AM.applications[ name ]
-    app.emit( 'close' )
+    
+    if( typeof app !== 'undefined')
+      app.emit( 'close' )
+    else
+      console.log( "App " + name + " tried to disconnect but is not currently registered." )
   },
   
   Application: function( properties ) {
     _.assign( this, properties )
     
     if( _.has( AM.applications, this.name ) ) {
-      console.log("closing existing app with name", this.name )
-      AM.applications[ this.name ].emit( 'close' )
+      if( AM.applications[ this.name ].ip === this.ip ) {
+        console.log("Closing existing app with name " + this.name + " to make way for new registration" )
+        AM.applications[ this.name ].emit( 'close' )
+      }
     }
     
     this.initialProperties = properties
@@ -126,15 +129,13 @@ AM = {
     this.on( 'close', function() { 
       for( var i = 0; i < this.mappings.length; i++ ) {
         var mapping = this.mappings[ i ]
-        //if( mapping.inputControl ) { mapping.inputControl.removeAllListeners() }
-        //if( mapping.outputControl ) { mapping.outputControl.removeAllListeners() }            
+        if( mapping.inputControl && mapping.inputControl.removeAllListeners ) { mapping.inputControl.removeAllListeners() }
+        if( mapping.outputControl && mapping.outputControl.removeAllListeners ) { mapping.outputControl.removeAllListeners() }            
       }
       
-      console.log(" CLOSING THE APP ")
-      //this.removeAllListeners()
+      console.log("Closing application ", this.name )
+      this.removeAllListeners()
     }.bind(this) )
-    
-    console.log( this.mappings )
   },
 }
 

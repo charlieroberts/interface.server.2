@@ -40,6 +40,11 @@ TODO: there should be some type of user preferences that decide which modules ar
         return this
       },      
 
+*createDevice* enables dynamic device creation over the network      
+      
+      createDevice: function( description ) {
+        var device = new IM.IO( description )
+      }, 
 Upon loading an IO object, the *verify* method is called on the object to ensure that it is valid. IO objects can have either inputs, outputs or both, but must have at least one.
 
       verify: function( io ) {
