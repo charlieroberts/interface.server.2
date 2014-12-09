@@ -18,8 +18,10 @@ AM = {
       }
     )
     
-    if( 'application' in IS.config ) AM.loadApplicationWithName( IS.config.application )
-    if( 'app' in IS.config ) AM.loadApplicationWithName( IS.config.app )
+    if( 'application' in IS.config ) 
+      AM.loadApplicationWithName( IS.config.application )
+    else if( 'app' in IS.config )
+      AM.loadApplicationWithName( IS.config.app )
     return this
   },
   
@@ -98,11 +100,12 @@ AM = {
     return app
   },
   removeApplicationWithName : function( name ) {
+    console.log("REMOVING", name)
     var app = AM.applications[ name ]
     app.emit( 'close' )
   },
   
-  Application: function( properties) {
+  Application: function( properties ) {
     _.assign( this, properties )
     
     this.initialProperties = properties

@@ -3,7 +3,7 @@ var EventEmitter = require( 'events' ).EventEmitter,
     util         = require( 'util' ),
     fs           = require( 'fs' ),
     _            = require( 'lodash'),
-Keys = {
+Keys = { 
   inputs: {},
   outputs:{},
   devices:[],

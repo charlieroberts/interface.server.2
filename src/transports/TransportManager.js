@@ -1,6 +1,6 @@
 !function() {
 var _ = require( 'lodash' ),
-    IS,
+    IS
 TM = {
   app: IS,
   defaults: [ 'OSC', 'WebSocket', 'ZeroMQ' ],
@@ -27,11 +27,11 @@ TM = {
       return
     }
     
-    //console.log( TM.app.root + 'transports/' + transportName + '.js ')
-    
+    // console.log("TRYING TO LOAD", 'interface.server.' + transportName )
     try {
-      transport = require( TM.app.root + 'transports/' + transportName + '.js' )( IS )
+      transport = require( 'interface.server.' + transportName )( IS )
     }catch( e ) {
+      console.log( "ERROR", e )
       throw 'Transport ' + transportName + ' not found.'
       return
     }finally{
@@ -45,7 +45,7 @@ TM = {
   },
   
   init: function() {
-    _.forEach( this.defaults, this.load )
+    _.forEach( _.keys( IS.config.transports ), this.load )
     
     return this
   },
@@ -56,14 +56,14 @@ TM = {
     }
     var destination = null
     switch( properties.type ) {
-      case 'OSC':
-        destination = this.transports[ 'OSC' ].sender( properties.ip, properties.port )
+      case 'osc':
+        destination = this.transports[ 'osc' ].sender( properties.ip, properties.port )
         break;
-      case 'WebSocket':
-        destination = this.transports[ 'WebSocket' ].createServer( properties.port )
+      case 'websocket':
+        destination = this.transports[ 'websocket' ].createServer( properties.port )
         break;
-      case 'ZeroMQ':
-        destination = this.transports[ 'ZeroMQ' ].createServer( properties.ip, properties.port )            
+      case 'zeromq':
+        destination = this.transports[ 'zeromq' ].createServer( properties.ip, properties.port )            
         break;
       default:
     }

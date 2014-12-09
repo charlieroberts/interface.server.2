@@ -3,7 +3,7 @@
 var _ = require( 'lodash' ), EE = require( 'events' ).EventEmitter, IS, fs = require( 'fs' )
 IM = {
   app: null,
-  defaults: [ 'interface.server.gamepad', './keypress' ],
+  //defaults: [ 'interface.server.gamepad', './keypress' ],
   loaded: [],
   
   devices: {},
@@ -14,7 +14,9 @@ IM = {
     this.__proto__ = new EE()
     this.__proto__.setMaxListeners( 0 )
 
-    _.forEach( this.defaults, this.load )
+    //_.forEach( this.defaults, this.load )
+    _.forEach( _.keys( IS.config.IO ), this.load )
+    
     this.on( 'new device', function( device ) {
       IM.devices[ device.name ] = device
       console.log( 'NEW DEVICE', device.name )
@@ -44,7 +46,7 @@ IM = {
     path = ioName
     
     try {
-      io = require( path )
+      io = require( 'interface.server.' + path )
     }catch( e ) {
       console.log( e )
       console.log( 'module ' + ioName + ' not found.' )

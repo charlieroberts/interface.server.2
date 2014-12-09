@@ -10,7 +10,7 @@ The keypress IO accepts keyboard input from the terminal
         fs           = require( 'fs' ),
         _            = require( 'lodash'),
 
-    Keys = {
+    Keys = { 
       inputs: {},
       outputs:{},
       devices:[],

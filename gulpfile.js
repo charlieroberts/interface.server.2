@@ -1,14 +1,16 @@
 var gulp  = require( 'gulp' ),
-    watch = require( 'gulp-watch' ),
     _     = require( 'lodash' ),
+    fs    = require( 'fs' ),
     files;
 
 gulp.task( 'watch', function(){
-  gulp.watch( 'src/**/*.js.md', function( event ) { 
+  gulp.watch( ['src/**/*.js.md', 'node_modules/**/*.js.md'], function( event ) { 
     var path = event.path    
         file = fs.readFileSync( path, 'utf8' ), 
         out  = file.match( /( {4})(.*)/g )
-      
+    
+    console.log( "recompiling", path )
+    
     out = _.invoke( out, 'slice', 4 )
       
     fs.writeFileSync( path.substring( 0, path.length - 3 ), out.join('\n'), 'utf8' );

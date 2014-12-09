@@ -34,12 +34,15 @@ SB = {
         value = IS[ components[0] ],
         tValue = 'object',
         found = null, lastObject = null, instanceVariableName
-        
+    
+    if( !components.length ) return // not a switchboard message
+    
     while( i < components.length && tValue === 'object' ) {
       lastObject = value
       value = value[ components[ i ] ]
       tValue = typeof value
       i++
+      conosle.log( value, lastObject )
     }
     
     instanceVariableName = components[ i - 1]

@@ -28,8 +28,10 @@ input messages.
           }
         )
         
-        if( 'application' in IS.config ) AM.loadApplicationWithName( IS.config.application )
-        if( 'app' in IS.config ) AM.loadApplicationWithName( IS.config.app )
+        if( 'application' in IS.config ) 
+          AM.loadApplicationWithName( IS.config.application )
+        else if( 'app' in IS.config )
+          AM.loadApplicationWithName( IS.config.app )
 
         return this
       },
@@ -118,6 +120,7 @@ JavaScript object.
       },
 
       removeApplicationWithName : function( name ) {
+        console.log("REMOVING", name)
         var app = AM.applications[ name ]
         app.emit( 'close' )
       },
