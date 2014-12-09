@@ -29,7 +29,7 @@ forwarded to the Switchboard for processing.
       },
       
       requiresAddress: [
-        'handshake'
+        'handshake', 'createApplicationWithText'
       ],
       route : function() {
         var args = Array.prototype.slice.call( arguments, 0 ),
@@ -54,7 +54,8 @@ forwarded to the Switchboard for processing.
         
         instanceVariableName = components[ i - 1]
         
-        if( instanceVariableName === 'handshake' ) {
+        if( SB.requiresAddress.indexOf( instanceVariableName ) > -1 ) {
+          console.log( "GOT IP ADDRESS FOR", instanceVariableName )
           msgArgs.push( address )
         }
         

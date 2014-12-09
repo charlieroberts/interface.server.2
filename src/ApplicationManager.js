@@ -91,6 +91,7 @@ AM = {
  
     this.emit( 'new application', app )
     
+    console.log("APP IP", app.ip, "IP", ip )
     return app
   },
   
@@ -126,10 +127,11 @@ AM = {
       for( var i = 0; i < this.mappings.length; i++ ) {
         var mapping = this.mappings[ i ]
         //if( mapping.inputControl ) { mapping.inputControl.removeAllListeners() }
-        if( mapping.outputControl ) { mapping.outputControl.removeAllListeners() }            
+        //if( mapping.outputControl ) { mapping.outputControl.removeAllListeners() }            
       }
       
-      this.removeAllListeners()
+      console.log(" CLOSING THE APP ")
+      //this.removeAllListeners()
     }.bind(this) )
     
     console.log( this.mappings )
@@ -192,7 +194,7 @@ _.assign( AM.Application.prototype, {
     
     if( mapping.output ) this.linkMappingOutputToDestinations( mapping, transports )
     app.on( 'close', function() { 
-      inputIO.removeListener( mapping.input.name, outputFunction ) 
+      //inputIO.removeListener( mapping.input.name, outputFunction ) 
     })  
     
     return mapping
