@@ -7,14 +7,8 @@
     "test": "tests"
   },
   "dependencies": {
-    "interface.server.gamepad": "~0.0.0",
-    "keypress": "~0.2.1",
     "lodash": "~2.4.1",
     "minimist": "~1.1.0",
-    "omgosc": "~1.0.0",
-    "ws": "~0.4.31",
-    "zmq": "~2.8.0",
-    "gkm": "0.0.4"
   },
   "devDependencies": {},
   "scripts": {
