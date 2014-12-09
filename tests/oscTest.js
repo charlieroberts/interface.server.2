@@ -9,8 +9,8 @@ Additionally, this script requires the osc-min module.
 */
 
 var oscMin = require( 'osc-min' ),
-    udp = require( 'dgram'),
-    oscReceivePort = 12001,
+    udp = require( 'dgram' ),
+    oscReceivePort = 15000,
     destinationIP = '127.0.0.1'
 
 // open socket and listen for messages    
@@ -23,10 +23,9 @@ osc.bind( oscReceivePort )
 
 // define app
 var app = "app = { name:'test1', transports: [{ type:'osc', port:" + oscReceivePort + " }]," +
-    "inputs: {blah:  { min: 200, max: 300, receivers:0 }, "+
-    "blah2: { min: 0, max: 1 } },"+
+    "inputs: { blah2: { min: 0, max: 1 } },"+
     "outputs :{},"+
-    "mappings: [{ input: { io:'keyboard', name:'b' }, output:{ io:'test1', name:'blah2' } }]"+
+    "mappings: [{ input: { io:'mydevice', name:'slider' }, output:{ io:'test1', name:'blah2' } }]"+
     "}"
 
 // convert app to OSC buffer

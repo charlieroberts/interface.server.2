@@ -1,1 +1,1 @@
-require('./src/Interface.Server').init()
+global.IS2 = require('./src/Interface.Server').init()

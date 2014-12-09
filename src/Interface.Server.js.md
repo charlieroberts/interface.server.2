@@ -6,6 +6,7 @@ main.js
         EE = require( 'events' ).EventEmitter,
         fs = require( 'fs'),
         parseArgs = require('minimist'),
+        repl = require( 'repl' ),
         Types, IS2;
 
     IS2 = {
@@ -34,6 +35,13 @@ main.js
         this.disconnectApplication = this.applicationManager.removeApplicationWithName
         
         if( this.onload ) this.onload()
+        
+        repl.start({
+          useGlobal:true,
+          prompt: "node via stdin> ",
+          input: process.stdin,
+          output: process.stdout
+        });
         
         return this
       }

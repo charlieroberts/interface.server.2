@@ -19,7 +19,7 @@ IM = {
     
     this.on( 'new device', function( device ) {
       IM.devices[ device.name ] = device
-      console.log( 'NEW DEVICE', device.name )
+      console.log( 'New IO loaded:', device.name )
     })
     return this
   },      
@@ -27,7 +27,10 @@ IM = {
   
   createDevice: function( description ) {
     var device = new IM.IO( description )
+    
+    return device
   }, 
+  
   verify: function( io ) {
     var result = false
     
@@ -37,7 +40,7 @@ IM = {
       }
     }
     
-    return result
+    return true//result
   },
   
   load: function( ioName ) {
@@ -52,18 +55,19 @@ IM = {
     
     try {
       io = require( 'interface.server.' + path )
+      if( typeof io === 'function' ) {
+        io = io( IS )
+      }
     }catch( e ) {
       console.log( e )
       console.log( 'module ' + ioName + ' not found.' )
       throw e
-    }finally{
-      console.log( 'module ' + ioName + ' is loaded.' )
     }
     
     if( IM.verify( io ) ) {
       
       io.on( 'new device', function( deviceName, device ) { 
-        console.log( "NEW ", deviceName )
+        console.log( "Module loaded: ", deviceName )
         IM.devices[ deviceName ] = device 
       })
       

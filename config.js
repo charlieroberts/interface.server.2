@@ -14,7 +14,12 @@ module.exports = {
     },
     
     IO : {
-      // gui : {},
+      // gui : {
+      //   // serve files to directory inside interface.server.gui repo
+      //   interfaceDirectory: __dirname + '/node_modules/interface.server.gui/interfaces',
+      //   appendID:false,
+      //   webServerPort: 10080,
+      // },
       // phasespace : {},
       // hid : {},
       keyboard : {},

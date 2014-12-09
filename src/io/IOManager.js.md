@@ -34,7 +34,7 @@ TODO: there should be some type of user preferences that decide which modules ar
         
         this.on( 'new device', function( device ) {
           IM.devices[ device.name ] = device
-          console.log( 'NEW DEVICE', device.name )
+          console.log( 'New IO loaded:', device.name )
         })
   
         return this
@@ -44,7 +44,10 @@ TODO: there should be some type of user preferences that decide which modules ar
       
       createDevice: function( description ) {
         var device = new IM.IO( description )
+        
+        return device
       }, 
+      
 Upon loading an IO object, the *verify* method is called on the object to ensure that it is valid. IO objects can have either inputs, outputs or both, but must have at least one.
 
       verify: function( io ) {
@@ -56,7 +59,7 @@ Upon loading an IO object, the *verify* method is called on the object to ensure
           }
         }
         
-        return result
+        return true//result
       },
       
 The *load* method attempts to find a given IO module and require it. If the module is found and verified, the modules *init* method is then called.
@@ -73,18 +76,19 @@ The *load* method attempts to find a given IO module and require it. If the modu
         
         try {
           io = require( 'interface.server.' + path )
+          if( typeof io === 'function' ) {
+            io = io( IS )
+          }
         }catch( e ) {
           console.log( e )
           console.log( 'module ' + ioName + ' not found.' )
           throw e
-        }finally{
-          console.log( 'module ' + ioName + ' is loaded.' )
         }
         
         if( IM.verify( io ) ) {
           
           io.on( 'new device', function( deviceName, device ) { 
-            console.log( "NEW ", deviceName )
+            console.log( "Module loaded: ", deviceName )
             IM.devices[ deviceName ] = device 
           })
           

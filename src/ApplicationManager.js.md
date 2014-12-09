@@ -186,7 +186,7 @@ whenever the input signal changes.
         if( typeof inputIO === 'undefined' ) { 
           console.log( 'ERROR: Input IO device ' + mapping.input.io + ' is not found. Cannot map ' + mapping.input.name + '.' )
           return
-        }
+        } 
         
         _in  = inputIO.outputs[ mapping.input.name ]
         
@@ -206,13 +206,13 @@ whenever the input signal changes.
           mapping.transform = typeof mapping.transform !== 'undefined' ? mapping.transform : true
           
         }else if( mapping.expression ){
-          outputFunction = function( inputValue) {
+          outputFunction = function( inputValue ) {
             return mapping.expression( inputValue )
           }
         }else{
           return 
         }
-            
+        
         inputIO.on( mapping.input.name, outputFunction )
         
         mapping.inputControl = _in

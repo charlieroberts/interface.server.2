@@ -59,7 +59,7 @@ forwarded to the Switchboard for processing.
         
         if( typeof value === 'function' ) {
           if( msgArgs.length ) {
-            value.apply( lastObject, msgArgs )
+            output = value.apply( lastObject, msgArgs )
           }else{
             output = value()
           }
