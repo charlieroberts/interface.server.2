@@ -80,12 +80,14 @@ AM = {
     
     app.mappings = _.map( mappings, app.createMapping, app )
   },
-  createApplicationWithText: function( appString ) {
-    var io, receivers, app
+  createApplicationWithText: function( appString, ip ) {
+    var io, transports, app
             
     eval( appString )
     
     app = new AM.Application( app )
+    
+    if( ip ) app.ip = ip
  
     this.emit( 'new application', app )
     
@@ -100,7 +102,6 @@ AM = {
     return app
   },
   removeApplicationWithName : function( name ) {
-    console.log("REMOVING", name)
     var app = AM.applications[ name ]
     app.emit( 'close' )
   },
@@ -112,7 +113,7 @@ AM = {
     
     this.io = new AM.app.ioManager.IO({ inputs:this.inputs, outputs:this.outputs, name: this.name })
     
-    this.receivers = _.map( this.receivers, this.createDestination, this )
+    this.transports = _.map( this.transports, this.createDestination, this )
     
     if( this.mappings ) this.mappings = _.map( this.mappings, this.createMapping, this )
   },
@@ -134,7 +135,7 @@ _.assign( AM.Application.prototype, {
   },
   
   createMapping: function( mapping ) {
-    var inputIO, outputIO, _in, _out, transform, outputFunction, app = this, receivers
+    var inputIO, outputIO, _in, _out, transform, outputFunction, app = this, transports
     
     inputIO  = AM.app.ioManager.devices[ mapping.input.io ]
     
@@ -172,7 +173,7 @@ _.assign( AM.Application.prototype, {
     
     mapping.inputControl = _in
     
-    if( mapping.output ) this.linkMappingOutputToDestinations( mapping, receivers )
+    if( mapping.output ) this.linkMappingOutputToDestinations( mapping, transports )
     app.on( 'close', function() { inputIO.removeListener( mapping.input.name, outputFunction ) })  
     
     return mapping
@@ -205,21 +206,20 @@ _.assign( AM.Application.prototype, {
       this.emit( 'value', output )
     }
   },
-  
   linkMappingOutputToDestinations: function( mapping ) {
-    var receivers
-    if( Array.isArray( mapping.outputControl.receivers ) ) {
-      receivers = []
-      for( var i = 0; i < mapping.outputControl.receivers.length; i++ ) {
-        receivers[ i ] = this.receivers[ mapping.outputControl.receivers[ i ] ]
+    var transports
+    if( Array.isArray( mapping.outputControl.transports ) ) {
+      transports = []
+      for( var i = 0; i < mapping.outputControl.transports.length; i++ ) {
+        transports[ i ] = this.transports[ mapping.outputControl.transports[ i ] ]
       }
     }else{
-      receivers = this.receivers.indexOf( mapping.outputControl.receivers ) > -1 ? [ this.receivers[ mapping.outputControl.receivers ] ] : this.receivers
+      transports = this.transports.indexOf( mapping.outputControl.transports ) > -1 ? [ this.transports[ mapping.outputControl.transports ] ] : this.transports
     }
 
-    for( var i = 0; i < receivers.length; i++ ) {
+    for( var i = 0; i < transports.length; i++ ) {
       ( function() {
-        var destination = receivers[ i ]
+        var destination = transports[ i ]
         if( _.isObject( destination ) ) {
           mapping.outputControl.on( 'value', function( _value ) {
             if( _value instanceof Array){

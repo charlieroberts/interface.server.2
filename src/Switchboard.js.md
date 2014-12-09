@@ -50,7 +50,6 @@ forwarded to the Switchboard for processing.
           value = value[ components[ i ] ]
           tValue = typeof value
           i++
-          conosle.log( value, lastObject )
         }
         
         instanceVariableName = components[ i - 1]
