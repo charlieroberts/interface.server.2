@@ -148,8 +148,10 @@ JavaScript object.
         this.on( 'close', function() { 
           for( var i = 0; i < this.mappings.length; i++ ) {
             var mapping = this.mappings[ i ]
-            if( mapping.inputControl && mapping.inputControl.removeAllListeners ) { mapping.inputControl.removeAllListeners() }
-            if( mapping.outputControl && mapping.outputControl.removeAllListeners ) { mapping.outputControl.removeAllListeners() }            
+            if( mapping ) {
+              if( mapping.inputControl && mapping.inputControl.removeAllListeners ) { mapping.inputControl.removeAllListeners() }
+              if( mapping.outputControl && mapping.outputControl.removeAllListeners ) { mapping.outputControl.removeAllListeners() }            
+            }
           }
           
           console.log("Closing application ", this.name )

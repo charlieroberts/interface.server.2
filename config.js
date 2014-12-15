@@ -21,7 +21,7 @@ module.exports = {
       //   webServerPort: 10080,
       // },
       // phasespace : {},
-      // hid : {},
+      gamepad: {},
       keyboard : {},
     }
 }
