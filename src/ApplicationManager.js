@@ -78,6 +78,7 @@ AM = {
     
     app.mappings = _.map( mappings, app.createMapping, app )
   },
+  
   createApplicationWithText: function( appString, ip ) {
     var io, transports, app
             
@@ -141,9 +142,7 @@ AM = {
   },
 }
 
-_.assign( AM.Application.prototype, {
-  
-        
+_.assign( AM.Application.prototype, {  
   createDestination: function( _destination, key ) {
     if( typeof _destination.ip === 'undefined' ) {
       // ip is assigned in loadApplicationWithName method of ApplicationManager
@@ -196,14 +195,13 @@ _.assign( AM.Application.prototype, {
     mapping.inputControl = _in
     
     if( mapping.output ) this.linkMappingOutputToDestinations( mapping, transports )
+
     app.on( 'close', function() { 
       //inputIO.removeListener( mapping.input.name, outputFunction ) 
     })  
     
     return mapping
   },
-  
-  
   
   createTransformFunction : function( _in, _out ) {        
     return function( value ) {
@@ -230,6 +228,7 @@ _.assign( AM.Application.prototype, {
       this.emit( 'value', output )
     }
   },
+  
   linkMappingOutputToDestinations: function( mapping ) {
     var transports
     if( Array.isArray( mapping.outputControl.transports ) ) {
@@ -237,10 +236,12 @@ _.assign( AM.Application.prototype, {
       for( var i = 0; i < mapping.outputControl.transports.length; i++ ) {
         transports[ i ] = this.transports[ mapping.outputControl.transports[ i ] ]
       }
+    }else if( typeof mapping.outputControl.transports === 'number' ){
+      transports = typeof this.transports[ mapping.outputControl.transports ] !== 'undefined' ? [ this.transports[ mapping.outputControl.transports ] ] : this.transports
     }else{
-      transports = this.transports.indexOf( mapping.outputControl.transports ) > -1 ? [ this.transports[ mapping.outputControl.transports ] ] : this.transports
+      transports = this.transports
     }
-    
+
     for( var i = 0; i < transports.length; i++ ) {
       ( function() {
         var destination = transports[ i ]

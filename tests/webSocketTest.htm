@@ -38,6 +38,7 @@ transports: {
   
   socket.onopen = function() { 
     // all output messages should take the form { path:'', params:[] }
+    console.log("SOCKET OPEN")
     socket.send( JSON.stringify({ key:'/interface/applicationManager/createApplicationWithText', values:[ app ] }) ) 
   }
   

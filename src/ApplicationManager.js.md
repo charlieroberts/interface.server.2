@@ -270,10 +270,12 @@ value can be a single array index, an array of indices, or -1 to indicate use of
           for( var i = 0; i < mapping.outputControl.transports.length; i++ ) {
             transports[ i ] = this.transports[ mapping.outputControl.transports[ i ] ]
           }
+        }else if( typeof mapping.outputControl.transports === 'number' ){
+          transports = typeof this.transports[ mapping.outputControl.transports ] !== 'undefined' ? [ this.transports[ mapping.outputControl.transports ] ] : this.transports
         }else{
-          transports = this.transports.indexOf( mapping.outputControl.transports ) > -1 ? [ this.transports[ mapping.outputControl.transports ] ] : this.transports
+          transports = this.transports
         }
-        
+
         for( var i = 0; i < transports.length; i++ ) {
           ( function() {
             var destination = transports[ i ]

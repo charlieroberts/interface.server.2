@@ -25,7 +25,7 @@ osc.bind( oscReceivePort )
 var app = "app = { name:'test1', transports: [{ type:'osc', port:" + oscReceivePort + " }]," +
     "inputs: { blah2: { min: 0, max: 1 } },"+
     "outputs :{},"+
-    "mappings: [{ input: { io:'mydevice', name:'slider' }, output:{ io:'test1', name:'blah2' } }]"+
+    "mappings: [{ input: { io:'keyboard', name:'b' }, output:{ io:'test1', name:'blah2' } }]"+
     "}"
 
 // convert app to OSC buffer

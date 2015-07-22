@@ -76,6 +76,8 @@ The *init* function loads every io stored named in the *defaults* array. TODO: t
 socket connection based on the value of the type property in dictionary. It abstracts the creation of
 WebSocket / OSC / MIDI etc. connection.
 
+TODO: REFACTOR THIS!
+      
       createDestination: function( properties ) {
         if( !_.has( this.transports, properties.type ) ) {
           throw 'Requested transport ' + properties.type + ' not found while creating destination'

@@ -55,6 +55,7 @@ TM = {
       throw 'Requested transport ' + properties.type + ' not found while creating destination'
     }
     var destination = null
+    
     switch( properties.type ) {
       case 'osc':
         destination = this.transports[ 'osc' ].sender( properties.ip, properties.port )
