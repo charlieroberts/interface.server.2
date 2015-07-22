@@ -1,6 +1,6 @@
 {
   "name": "interface.server",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Design interactive interfaces using various devices and OSC/0MQ/WebSockets",
   "main": "index.js",
   "directories": {
