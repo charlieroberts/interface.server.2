@@ -1,8 +1,10 @@
 // The appended number allows us to refer to a specific device if multiple devices
 // of the same name are found
 
-// var gamepad = 'Logitech Dual Action #1'
-var gamepad = 'Logitech RumblePad 2 USB #1',
+// var gamepad = 'Logitech Dual Action #1',
+var gamepad = 'PLAYSTATION(R)3 Controller #1',
+    gamepad2 = 'PLAYSTATION(R)3 Controller #2',
+//var gamepad = 'Logitech RumblePad 2 USB #1',
     count = 0
 
 module.exports = {
@@ -16,7 +18,7 @@ module.exports = {
     // no ip address means derive ip from handshake message
     { type:'osc', port:18080 },
 
-    // { type:'zeromq', ip:'127.0.0.1', port:10080 },
+    { type:'zmq', ip:'127.0.0.1', port:10080 },
   ],
   
   inputs: {
@@ -34,13 +36,16 @@ module.exports = {
   mappings: [
     // if no output object is found, simply call the expression with the provided input.
     { input: { io:'keyboard', name:'a' }, output:{ io:'test1', name:'blah' } },//, expression: function(v) { return 1999 } },
+    //{ input: { io:'mouse', name:'x'}, expression: function(v){ console.log( v ) } },
+    //{ input: { io:'mouse', name:'leftButton'}, expression: function(v){ console.log( "MOUSE BUTTON", v ) } },    
     // {
     //   input: { io:'keyboard', name:'b' },
     //   output:{ io:'test1', name:'blah2' },
     //   expression: function() { return count++ }
     // },
-
-    //{ input: { io:gamepad, name:'button1' }, expression: function(v) { console.log(v, v * 15) } },
+    { input: { io:'spacenavigator', name:'tx' }, output:{ io:'test1', name:'blah'} },
+    //{ input: { io:gamepad, name:'buttonL1Analog' }, expression: function(v) { console.log("X", v ) } },
+    //{ input: { io:gamepad2, name:'buttonL1Analog' }, expression: function(v) { console.log("X2", v ) } },
 
     // map to input blah2 on app test1
     // { input: { io:gamepad, name:'button2' }, output:{ io:'test1', name:'blah2' } },

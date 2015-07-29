@@ -182,31 +182,45 @@ whenever the input signal changes.
 
       createMapping: function( mapping ) {
         var inputIO, outputIO, _in, _out, transform, outputFunction, app = this, transports
-        
+    
         inputIO  = AM.app.ioManager.devices[ mapping.input.io ]
-        
-        if( typeof inputIO === 'undefined' ) { 
-          console.log( 'ERROR: Input IO device ' + mapping.input.io + ' is not found. Cannot map ' + mapping.input.name + '.' )
+     
+        if( typeof inputIO === 'undefined' ) {
+          IS.ioManager.on( 'new device', function( device ){
+            var output = mapping.output ? mapping.output.name : 'an expression'
+            console.log( "Device added; mapping " + mapping.input.name + ' to ' + output + ' in app ' + app.name )
+            if( device.name === mapping.input.io ) {
+              inputIO = AM.app.ioManager.devices[ mapping.input.io ]
+          
+              this.linkMapping( mapping, inputIO )
+            }
+          }.bind( this ))
+          console.log( 'ERROR: Input IO device ' + mapping.input.io + ' is not found. Cannot map ' + mapping.input.name + '. Please connect IO device.' )
           return
-        } 
-        
-        _in  = inputIO.outputs[ mapping.input.name ]
-        
+        }
+    
+        this.linkMapping( mapping, inputIO )
+    
+        return mapping
+      },
+  
+      linkMapping: function( mapping, inputIO ) {
+        var _in  = inputIO.outputs[ mapping.input.name ]
         if( mapping.output ) {
-          outputIO = AM.app.ioManager.devices[ mapping.output.io ]
-          
-          _out = outputIO.inputs[ mapping.output.name ]
+          var outputIO = AM.app.ioManager.devices[ mapping.output.io ]
+      
+          var _out = outputIO.inputs[ mapping.output.name ]
           _out.__proto__ = new EE()
-          
-          transform = this.createTransformFunction( _in, _out )
-        
-          outputFunction = this.createOutputFunctionForMapping( mapping ).bind( _out )
-          
+      
+          var transform = this.createTransformFunction( _in, _out )
+    
+          var outputFunction = this.createOutputFunctionForMapping( mapping ).bind( _out )
+      
           mapping.outputControl = _out
           mapping.outputFunction = outputFunction
           mapping.transformFunction = transform
           mapping.transform = typeof mapping.transform !== 'undefined' ? mapping.transform : true
-          
+      
         }else if( mapping.expression ){
           outputFunction = function( inputValue ) {
             return mapping.expression( inputValue )
@@ -214,20 +228,17 @@ whenever the input signal changes.
         }else{
           return 
         }
-        
+    
         inputIO.on( mapping.input.name, outputFunction )
-        
+    
         mapping.inputControl = _in
-        
-        if( mapping.output ) this.linkMappingOutputToDestinations( mapping, transports )
-
-        app.on( 'close', function() { 
-          //inputIO.removeListener( mapping.input.name, outputFunction ) 
-        })  
-        
-        return mapping
-      },
+    
+        if( mapping.output ) this.linkMappingOutputToDestinations( mapping, this.transports )
       
+        this.on( 'close', function() { 
+          inputIO.removeListener( mapping.input.name, outputFunction ) 
+        }) 
+      },
 *createTransformFunction* get input / output mins maxs and ranges and create function using them to calculate affine
 transform.      
       
@@ -275,7 +286,7 @@ value can be a single array index, an array of indices, or -1 to indicate use of
         }else{
           transports = this.transports
         }
-
+        console.log( transports )
         for( var i = 0; i < transports.length; i++ ) {
           ( function() {
             var destination = transports[ i ]
@@ -289,6 +300,7 @@ value can be a single array index, an array of indices, or -1 to indicate use of
               }
               mapping.outputControl.on( 'value', func )
             }else{
+              console.log( "DESTINATION", destination )
               throw 'A null destination was encountered';
             }
           })()

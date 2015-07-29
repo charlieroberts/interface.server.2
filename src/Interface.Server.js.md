@@ -24,8 +24,8 @@ main.js
         
         _.assign( this.config, args )
 
-        this.ioManager          = require( './io/IOManager.js' )( this ).init()
-        this.transportManager   = require( './transports/TransportManager.js' )( this ).init()
+        this.ioManager          = require( './IOManager.js' )( this ).init()
+        this.transportManager   = require( './TransportManager.js' )( this ).init()
         this.applicationManager = require( './ApplicationManager.js' )( this ).init()
         this.switchboard        = require( './Switchboard.js' )( this ).init()
         Types = this.types      = require( './Types.js' )( this ).init()
@@ -38,7 +38,7 @@ main.js
         
         repl.start({
           useGlobal:true,
-          prompt: "node via stdin> ",
+          prompt: "interface.server > ",
           input: process.stdin,
           output: process.stdout
         });

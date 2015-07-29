@@ -91,8 +91,8 @@ TODO: REFACTOR THIS!
           case 'websocket':
             destination = this.transports[ 'websocket' ].createServer( properties.port )
             break;
-          case 'zeromq':
-            destination = this.transports[ 'zeromq' ].createServer( properties.ip, properties.port )            
+          case 'zmq':
+            destination = this.transports[ 'zmq' ].createServer( properties.ip, properties.port )            
             break;
           default:
         }

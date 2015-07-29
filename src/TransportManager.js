@@ -50,12 +50,12 @@ TM = {
     return this
   },
   
+  
   createDestination: function( properties ) {
     if( !_.has( this.transports, properties.type ) ) {
       throw 'Requested transport ' + properties.type + ' not found while creating destination'
     }
     var destination = null
-    
     switch( properties.type ) {
       case 'osc':
         destination = this.transports[ 'osc' ].sender( properties.ip, properties.port )
@@ -63,8 +63,8 @@ TM = {
       case 'websocket':
         destination = this.transports[ 'websocket' ].createServer( properties.port )
         break;
-      case 'zeromq':
-        destination = this.transports[ 'zeromq' ].createServer( properties.ip, properties.port )            
+      case 'zmq':
+        destination = this.transports[ 'zmq' ].createServer( properties.ip, properties.port )            
         break;
       default:
     }

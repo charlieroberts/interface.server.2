@@ -78,7 +78,6 @@ AM = {
     
     app.mappings = _.map( mappings, app.createMapping, app )
   },
-  
   createApplicationWithText: function( appString, ip ) {
     var io, transports, app
             
@@ -142,7 +141,9 @@ AM = {
   },
 }
 
-_.assign( AM.Application.prototype, {  
+_.assign( AM.Application.prototype, {
+  
+        
   createDestination: function( _destination, key ) {
     if( typeof _destination.ip === 'undefined' ) {
       // ip is assigned in loadApplicationWithName method of ApplicationManager
@@ -157,31 +158,44 @@ _.assign( AM.Application.prototype, {
   
   createMapping: function( mapping ) {
     var inputIO, outputIO, _in, _out, transform, outputFunction, app = this, transports
-    
+
     inputIO  = AM.app.ioManager.devices[ mapping.input.io ]
-    
-    if( typeof inputIO === 'undefined' ) { 
-      console.log( 'ERROR: Input IO device ' + mapping.input.io + ' is not found. Cannot map ' + mapping.input.name + '.' )
+ 
+    if( typeof inputIO === 'undefined' ) {
+      IS.ioManager.on( 'new device', function( device ){
+        var output = mapping.output ? mapping.output.name : 'an expression'
+        console.log( "Device added; mapping " + mapping.input.name + ' to ' + output + ' in app ' + app.name )
+        if( device.name === mapping.input.io ) {
+          inputIO = AM.app.ioManager.devices[ mapping.input.io ]
+      
+          this.linkMapping( mapping, inputIO )
+        }
+      }.bind( this ))
+      console.log( 'ERROR: Input IO device ' + mapping.input.io + ' is not found. Cannot map ' + mapping.input.name + '. Please connect IO device.' )
       return
-    } 
-    
-    _in  = inputIO.outputs[ mapping.input.name ]
-    
+    }
+
+    this.linkMapping( mapping, inputIO )
+
+    return mapping
+  },
+  linkMapping: function( mapping, inputIO ) {
+    var _in  = inputIO.outputs[ mapping.input.name ]
     if( mapping.output ) {
-      outputIO = AM.app.ioManager.devices[ mapping.output.io ]
-      
-      _out = outputIO.inputs[ mapping.output.name ]
+      var outputIO = AM.app.ioManager.devices[ mapping.output.io ]
+  
+      var _out = outputIO.inputs[ mapping.output.name ]
       _out.__proto__ = new EE()
-      
-      transform = this.createTransformFunction( _in, _out )
-    
-      outputFunction = this.createOutputFunctionForMapping( mapping ).bind( _out )
-      
+  
+      var transform = this.createTransformFunction( _in, _out )
+
+      var outputFunction = this.createOutputFunctionForMapping( mapping ).bind( _out )
+  
       mapping.outputControl = _out
       mapping.outputFunction = outputFunction
       mapping.transformFunction = transform
       mapping.transform = typeof mapping.transform !== 'undefined' ? mapping.transform : true
-      
+  
     }else if( mapping.expression ){
       outputFunction = function( inputValue ) {
         return mapping.expression( inputValue )
@@ -189,19 +203,18 @@ _.assign( AM.Application.prototype, {
     }else{
       return 
     }
-    
-    inputIO.on( mapping.input.name, outputFunction )
-    
-    mapping.inputControl = _in
-    
-    if( mapping.output ) this.linkMappingOutputToDestinations( mapping, transports )
 
-    app.on( 'close', function() { 
-      //inputIO.removeListener( mapping.input.name, outputFunction ) 
-    })  
-    
-    return mapping
+    inputIO.on( mapping.input.name, outputFunction )
+
+    mapping.inputControl = _in
+
+    if( mapping.output ) this.linkMappingOutputToDestinations( mapping, this.transports )
+  
+    this.on( 'close', function() { 
+      inputIO.removeListener( mapping.input.name, outputFunction ) 
+    }) 
   },
+  
   
   createTransformFunction : function( _in, _out ) {        
     return function( value ) {
@@ -228,7 +241,6 @@ _.assign( AM.Application.prototype, {
       this.emit( 'value', output )
     }
   },
-  
   linkMappingOutputToDestinations: function( mapping ) {
     var transports
     if( Array.isArray( mapping.outputControl.transports ) ) {
@@ -241,7 +253,7 @@ _.assign( AM.Application.prototype, {
     }else{
       transports = this.transports
     }
-
+    console.log( transports )
     for( var i = 0; i < transports.length; i++ ) {
       ( function() {
         var destination = transports[ i ]
@@ -255,6 +267,7 @@ _.assign( AM.Application.prototype, {
           }
           mapping.outputControl.on( 'value', func )
         }else{
+          console.log( "DESTINATION", destination )
           throw 'A null destination was encountered';
         }
       })()

@@ -1,0 +1,46 @@
+<!-- NOTE THIS TEST ASSUMES YOU HAVE THE interface.server.websocket MODULE INSTALLED.
+
+You also need to specify the same port in line 13 as that found in the webserverport property of
+the config.js for interface.server. Like here:
+
+transports: {
+  websocket: {
+    webServerPort: 9080
+  }
+}
+ -->
+
+<html>
+<head>
+  <title>Interface.Server 2 WebSocket Test</title>
+</head>
+<body></body>
+<script>
+  
+  var socketString = 'ws://127.0.0.1:9080',
+      socket = new WebSocket( socketString )
+      
+  body = document.querySelector('body')
+  
+  var app = "app = { name:'myapp', transports: [{ type:'websocket', port:9080 }]," +
+      "inputs: { blah2: { min: 0, max: 1 } },"+
+      "outputs :{}},"+
+      "mappings: [{ input: { io:'mydevice', name:'testing' }, output:{ io:'myapp', name:'blah2' } }]"+
+      "}"
+  
+  socket.onmessage = function (event) {
+    var data = JSON.parse( event.data ),
+        p = document.createElement( 'p' )
+    
+    console.log( event )
+    p.innerHTML = data.key + " : " + data.values.toString()
+    body.appendChild( p )
+  }
+  
+  socket.onopen = function() { 
+    // all output messages should take the form { path:'', params:[] }
+    socket.send( JSON.stringify({ key:'/interface/applicationManager/createApplicationWithText', values:[ app ] }) ) 
+  }
+  
+</script>
+</html>
