@@ -14,6 +14,7 @@ main.js
       transportManager:   null,
       applicationManager: null,
       root: __dirname + '/',
+      monitors: {},
       init: function() {
         this.__proto__ = new EE()
         this.__proto__.setMaxListeners( 0 )
@@ -33,6 +34,32 @@ main.js
         // shortcuts for connecting / disconnecting these make it /interface/handshake instead of /interface/applicationManager/handshake
         this.handshake = this.applicationManager.handshake
         this.disconnectApplication = this.applicationManager.removeApplicationWithName
+        this.startMonitoring = function( device, name ) {
+          if( ! IS2.monitors[ device ] ) IS2.monitors[ device ] = {}
+          
+          IS2.monitors[ device ][ name ] = function( v ) {
+            console.log( "device " + device + " : " + name + " " + v )
+          }
+          
+          IS2.ioManager.devices[ device ].on( name, IS2.monitors[ device ][ name ] )
+        }
+        
+        this.stopMonitoring = function( device, name ) {
+          try {
+            IS2.ioManager.devices[ device ].removeListener( name, IS2.monitors[ device ][ name ] )
+          }catch(e) {
+            console.log( "Error removing monitoring: ", e)
+          }
+        }
+        
+        this.listDevices = function() {
+          for( var key in IS2.ioManager.devices ) { console.log( key ) }
+        }
+        
+        this.quit = function() {
+          console.log( 'Now terminating...' )
+          process.exit()
+        }
         
         if( this.onload ) this.onload()
         
@@ -50,6 +77,3 @@ main.js
     module.exports = IS2
      
     }()
-    
-// var q = [ .65,-.27,.65,.27 ]
-// console.log( "CONVERT", Types.convert( 'Quaternion', 'Euler', q ) )

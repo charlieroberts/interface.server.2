@@ -36,7 +36,8 @@ module.exports = {
   mappings: [
     // if no output object is found, simply call the expression with the provided input.
     { input: { io:'keyboard', name:'a' }, output:{ io:'test1', name:'blah' } },//, expression: function(v) { return 1999 } },
-    //{ input: { io:'mouse', name:'x'}, expression: function(v){ console.log( v ) } },
+    { input: { io:'keyboard', name:'shift+a' }, output:{ io:'test1', name:'blah' } },//, expression: function(v) { return 1999 } },
+    // { input: { io:'keyboard', name:'b'}, expression: function(v){ console.log( IS2 ) } },
     //{ input: { io:'mouse', name:'leftButton'}, expression: function(v){ console.log( "MOUSE BUTTON", v ) } },    
     // {
     //   input: { io:'keyboard', name:'b' },

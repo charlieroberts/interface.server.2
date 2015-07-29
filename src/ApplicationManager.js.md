@@ -286,7 +286,7 @@ value can be a single array index, an array of indices, or -1 to indicate use of
         }else{
           transports = this.transports
         }
-        console.log( transports )
+
         for( var i = 0; i < transports.length; i++ ) {
           ( function() {
             var destination = transports[ i ]
@@ -300,8 +300,7 @@ value can be a single array index, an array of indices, or -1 to indicate use of
               }
               mapping.outputControl.on( 'value', func )
             }else{
-              console.log( "DESTINATION", destination )
-              throw 'A null destination was encountered';
+              console.log( 'A null destination was encountered for mapping ' + mapping )
             }
           })()
         }

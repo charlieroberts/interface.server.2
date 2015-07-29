@@ -253,7 +253,6 @@ _.assign( AM.Application.prototype, {
     }else{
       transports = this.transports
     }
-    console.log( transports )
     for( var i = 0; i < transports.length; i++ ) {
       ( function() {
         var destination = transports[ i ]
@@ -267,8 +266,7 @@ _.assign( AM.Application.prototype, {
           }
           mapping.outputControl.on( 'value', func )
         }else{
-          console.log( "DESTINATION", destination )
-          throw 'A null destination was encountered';
+          console.log( 'A null destination was encountered for mapping ' + mapping )
         }
       })()
     }
