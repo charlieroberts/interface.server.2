@@ -99,6 +99,14 @@ AM = {
     
     return app
   },
+  
+  removeAllApplications: function( doNotRemove ) {
+    for( var appName in AM.applications ) {
+      if( appName !== doNotRemove ) {
+        AM.removeApplicationWithName( appName )
+      }
+    }
+  },
   removeApplicationWithName : function( name ) {
     var app = AM.applications[ name ]
     
