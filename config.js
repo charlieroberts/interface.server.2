@@ -25,6 +25,6 @@ module.exports = {
       //spacenavigator: { rate:10 },
       gamepad: {},
       keyboard : {},
-      mouse:{}
+      //mouse:{}
     }
 }
