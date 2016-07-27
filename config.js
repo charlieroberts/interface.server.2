@@ -8,21 +8,21 @@ module.exports = {
       osc : {
         remoteControlPort: 12000,
       },
-      zmq: {}
+      //zmq: {}
       // websocket: {
       //   webServerPort: 9080
       // }
     },
     
     IO : {
-      gui : {
-        // serve files to directory inside interface.server.gui repo
-        interfaceDirectory: __dirname + '/node_modules/interface.server.gui/interfaces',
-        appendID:false,
-        webServerPort: 10080,
-      },
+      //gui : {
+      //  // serve files to directory inside interface.server.gui repo
+      //  interfaceDirectory: __dirname + '/node_modules/interface.server.gui/interfaces',
+      //  appendID:false,
+      //  webServerPort: 10080,
+      //},
       // phasespace : {},
-      spacenavigator: { rate:10 },
+      //spacenavigator: { rate:10 },
       gamepad: {},
       keyboard : {},
       mouse:{}

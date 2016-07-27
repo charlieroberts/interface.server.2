@@ -34,7 +34,8 @@ forwarded to the Switchboard for processing.
       route : function( args, address ) {
         var msg  = args[ 0 ],
             msgArgs = args.slice( 1 ),
-            components = msg.split( '/' ).slice( 2 ), // first should be empty, second is 'interface'
+            sliceNum = msg[1] === 'interface' ? 2 : 1,
+            components = msg.split( '/' ).slice( sliceNum ), // first should be empty, second is 'interface'
             output = null, // return null if this is not a getter call
             i = 1, 
             value = IS[ components[0] ],

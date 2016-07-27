@@ -19,25 +19,26 @@ SB = {
     
     return this;
   },
-  
   requiresAddress: [
     'handshake', 'createApplicationWithText'
   ],
   route : function( args, address ) {
     var msg  = args[ 0 ],
         msgArgs = args.slice( 1 ),
-        components = msg.split( '/' ).slice( 2 ), // first should be empty, second is 'interface'
+        preSplit = msg.split( '/' ),
+        sliceNum = preSplit[1] === 'interface' ? 2 : 1,
+        components = msg.split( '/' ).slice( sliceNum ), // first should be empty, second is 'interface'
         output = null, // return null if this is not a getter call
         i = 1, 
         value = IS[ components[0] ],
         tValue = 'object',
         found = null, lastObject = null, instanceVariableName
     
-    // console.log( args, msg, msgArgs, address, components )
     if( !components.length ) return // not a switchboard message
     
     while( i < components.length && tValue === 'object' ) {
       lastObject = value
+      console.log( lastObject, value  )
       value = value[ components[ i ] ]
       tValue = typeof value
       i++
