@@ -25,8 +25,9 @@ AM = {
     return this
   },
   
-  handshake: function( appName, ip ) {
-    var app = AM.loadApplicationWithName( appName, ip )
+  handshake: function( appName, port, ip ) {
+    console.log( 'HANDSHAKE', arguments )
+    var app = AM.loadApplicationWithName( appName, ip, port )
     
     return app
   },
