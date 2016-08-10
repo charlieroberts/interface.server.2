@@ -187,23 +187,24 @@ _.assign( AM.Application.prototype, {
 
     return mapping
   },
+
   linkMapping: function( mapping, inputIO ) {
     var _in  = inputIO.outputs[ mapping.input.name ]
+
     if( mapping.output ) {
       var outputIO = AM.app.ioManager.devices[ mapping.output.io ]
-  
-      var _out = outputIO.inputs[ mapping.output.name ]
-      _out.__proto__ = new EE()
-  
-      var transform = this.createTransformFunction( _in, _out )
 
-      var outputFunction = this.createOutputFunctionForMapping( mapping ).bind( _out )
-  
-      mapping.outputControl = _out
-      mapping.outputFunction = outputFunction
-      mapping.transformFunction = transform
-      mapping.transform = typeof mapping.transform !== 'undefined' ? mapping.transform : true
-  
+      if( outputIO === undefined ) {
+        var self = this
+        IS.ioManager.on( 'new device', function( device ) {
+          if( device.name === mapping.output.io ) {
+            outputIO = AM.app.ioManager.devices[ mapping.output.io ]
+            self.mapInputToOutput( mapping, inputIO, outputIO, _in )
+          }
+        })
+      }else{
+        this.mapInputToOutput( mapping, inputIO, outputIO, _in )
+      }
     }else if( mapping.expression ){
       outputFunction = function( inputValue ) {
         return mapping.expression( inputValue )
@@ -211,10 +212,28 @@ _.assign( AM.Application.prototype, {
     }else{
       return 
     }
+  },
 
+  mapInputToOutput : function( mapping, inputIO, outputIO, inputControl ) {
+    var _out = outputIO.inputs[ mapping.output.name ]
+    _out.__proto__ = new EE()
+
+    var transform = this.createTransformFunction( inputControl, _out )
+
+    var outputFunction = this.createOutputFunctionForMapping( mapping ).bind( _out )
+
+    mapping.outputControl = _out
+    mapping.outputFunction = outputFunction
+    mapping.transformFunction = transform
+    mapping.transform = typeof mapping.transform !== 'undefined' ? mapping.transform : true
+    
+    this.finalizeMapping( mapping, inputIO, outputFunction, inputControl )
+  },
+
+  finalizeMapping : function( mapping, inputIO, outputFunction, inputControl ) {
     inputIO.on( mapping.input.name, outputFunction )
 
-    mapping.inputControl = _in
+    mapping.inputControl = inputControl
 
     if( mapping.output ) this.linkMappingOutputToDestinations( mapping, this.transports )
   
